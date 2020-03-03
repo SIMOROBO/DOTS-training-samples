@@ -25,6 +25,13 @@ public struct DistanceFieldData : IComponentData
 [AlwaysSynchronizeSystem]
 public class DistanceFieldSelectionSystem : JobComponentSystem
 {
+    private int _ModesCount;
+
+    protected override void OnCreate()
+    {
+        _ModesCount = DistanceFieldModels.GetNames(typeof(DistanceFieldModels)).Length;
+    }
+
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var deltatime = Time.DeltaTime;
@@ -39,7 +46,7 @@ public class DistanceFieldSelectionSystem : JobComponentSystem
             {
                 currentMode += 1;
                 
-                if(currentMode == 5)
+                if(currentMode == _ModesCount)
                 {
                     currentMode = 0;
                 }
