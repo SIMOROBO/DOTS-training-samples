@@ -1,8 +1,9 @@
-﻿public enum DistanceFieldModel {
-	SpherePlane,
-	Metaballs,
-	SpinMixer,
-	SphereField,
-	FigureEight,
-	PerlinNoise
+﻿public enum DistanceFieldModel
+{
+    SpherePlane,
+    Metaballs,
+    SpinMixer,
+    SphereField,
+    FigureEight,
+    PerlinNoise
 }
