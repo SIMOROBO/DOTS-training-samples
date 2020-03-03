@@ -10,6 +10,7 @@ using static Unity.Mathematics.math;
 public struct ParticlSpawner : IComponentData
 {
     public int Count;
+    public int Radius;
     public Entity Prefab;
 }
 
@@ -18,12 +19,16 @@ public class ParticleSpawnerSystem : JobComponentSystem
 
     protected override JobHandle OnUpdate(JobHandle inputDependencies)
     {
-        Entities.WithStructuralChanges().WithoutBurst().ForEach((Entity entity, in ParticlSpawner spawner) =>
+        Entities.WithStructuralChanges().WithoutBurst().ForEach((Entity entity, in ParticlSpawner spawner, in Translation translation) =>
         {
-            var particles = EntityManager.Instantiate(spawner.Prefab, spawner.Count, Allocator.Temp);
-            //var positions = new NativeArray<float3>(spawner.Count, Allocator.Temp);
-            //GeneratePoints.RandomPointsInUnitSphere(positions);
-            //positions.Dispose();
+            var particles = EntityManager.Instantiate(spawner.Prefab, spawner.Count, Allocator.TempJob);
+            var positions = new NativeArray<float3>(spawner.Count, Allocator.TempJob);
+            GeneratePoints.RandomPointsInSphere(translation.Value, spawner.Radius, positions);
+            for (var i = 0; i < spawner.Count; i++)
+            {
+                EntityManager.SetComponentData(particles[i], new Translation { Value = positions[i] });
+            }
+            positions.Dispose();
             particles.Dispose();
             EntityManager.DestroyEntity(entity);
         }).Run();
