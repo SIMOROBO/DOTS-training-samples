@@ -3,26 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
 using Unity.Jobs;
+using Unity.Burst;
 
-public enum DistanceFieldModels
-{
-    SpherePlane,
-    Metaballs,
-    SpinMixer,
-    SphereField,
-    FigureEight,
-    PerlinNoise
-}
 
-[GenerateAuthoringComponent]
-public struct DistanceFieldData : IComponentData
-{
-    public DistanceFieldModels Model;
-    public double ElapsedTime;
-    public KeyCode ChangeModeKey;
-}
-
-[AlwaysSynchronizeSystem]
 public class DistanceFieldSelectionSystem : JobComponentSystem
 {
     private int _ModesCount;
@@ -32,32 +15,49 @@ public class DistanceFieldSelectionSystem : JobComponentSystem
         _ModesCount = DistanceFieldModels.GetNames(typeof(DistanceFieldModels)).Length;
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    [BurstCompile]
+    struct DistanceFieldSelectionJob : IJobForEach<DistanceFieldModeData>
     {
-        var deltatime = Time.DeltaTime;
-        
-        Entities.WithoutBurst().ForEach((ref DistanceFieldData distanceField) => {
 
-            var mode = distanceField.Model;
+        public float deltaTime;
+        public int modesCount;
+        public bool keyUp;
+
+        public void Execute(ref DistanceFieldModeData ModeData)
+        {
+            var mode = ModeData.Model;
             var currentMode = (int)mode;
-            var time = distanceField.ElapsedTime + deltatime;
+            var time = ModeData.ElapsedTime + deltaTime;
 
-            if (time >= 10 || Input.GetKeyUp(distanceField.ChangeModeKey))
+            if (time >= 10 || keyUp)
             {
                 currentMode += 1;
-                
-                if(currentMode == _ModesCount)
+
+                if (currentMode == modesCount)
                 {
                     currentMode = 0;
                 }
 
-                distanceField.Model = (DistanceFieldModels)currentMode;
+                ModeData.Model = (DistanceFieldModels)currentMode;
                 time = 0;
             }
 
-            distanceField.ElapsedTime = time;
-        }).Run();
+            ModeData.ElapsedTime = time;
+        }
+            
+    }
 
-        return default;
+    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    {
+        var ModeSelectionJob = new DistanceFieldSelectionJob
+        {
+            deltaTime = Time.DeltaTime,
+            modesCount = _ModesCount,
+            keyUp = Input.GetKeyUp(KeyCode.Space)
+        };
+
+        var ModeHandle = ModeSelectionJob.Schedule(this);
+       
+        return ModeHandle;
     }
 }
