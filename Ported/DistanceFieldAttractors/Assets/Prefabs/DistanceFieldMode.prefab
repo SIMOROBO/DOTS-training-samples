@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6528619423295755174}
   - component: {fileID: 7666783445537636117}
+  - component: {fileID: 3873398599364873654}
   - component: {fileID: 6528619423295755175}
   m_Layer: 0
   m_Name: DistanceFieldMode
@@ -46,7 +47,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Model: 0
   ElapsedTime: 0
-  ChangeModeKey: 32
+--- !u!114 &3873398599364873654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6528619423295755172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25011f04d209440c7aee9469d22fdef5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attraction: 0.003
+  speedStretch: 5
+  jitter: 0.001
+  particleMesh: {fileID: 0}
+  particleMaterial: {fileID: 0}
+  surfaceColor: {r: 0.31989613, g: 0.24178201, b: 0.63235295, a: 1}
+  interiorColor: {r: 0.9044118, g: 0.458856, b: 0.458856, a: 1}
+  exteriorColor: {r: 0.5230861, g: 0.84290206, b: 0.9485294, a: 1}
+  exteriorColorDist: 5
+  interiorColorDist: 1.5
+  colorStiffness: 4
 --- !u!114 &6528619423295755175
 MonoBehaviour:
   m_ObjectHideFlags: 0
