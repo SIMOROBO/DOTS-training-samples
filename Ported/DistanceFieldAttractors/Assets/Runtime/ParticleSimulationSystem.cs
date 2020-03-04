@@ -16,7 +16,7 @@ public class ParticleSimulationSystem : JobComponentSystem
 {
     //private EntityQuery m_ParticleQuery;
     [BurstCompile]
-    struct ParticleSimulationJob : IJobForEach<ParticleData, MaterialData, Translation>
+    struct ParticleSimulationJob : IJobForEach<ParticleData, MaterialData>
     {
         public DistanceFieldModels Model;
         public float Time;
@@ -141,10 +141,9 @@ public class ParticleSimulationSystem : JobComponentSystem
             return distance;
         }
 
-        public void Execute(ref ParticleData particleData, ref MaterialData materialData, ref Translation translation)
+        public void Execute(ref ParticleData particleData, ref MaterialData materialData)
         {
             var position = particleData.Position;
-            //var position = translation.Value;
             var velocity = particleData.Velocity;
 
             float dist = GetDistance(position.x, position.y, position.z, out float3 normal);
@@ -165,7 +164,6 @@ public class ParticleSimulationSystem : JobComponentSystem
 
             materialData.Color = math.lerp(materialData.Color, targetColor, DeltaTime * ColorStiffness);
             particleData.Position = position;
-            //translation.Value = position;
             particleData.Velocity = velocity;
         }
 

@@ -25,8 +25,11 @@ public class ParticleSpawnerSystem : JobComponentSystem
             GeneratePoints.RandomPointsInSphere(translation.Value, spawner.Radius, positions);
             for (var i = 0; i < spawner.Count; i++)
             {
-                EntityManager.SetComponentData(particles[i], new Translation { Value = positions[i] });
                 EntityManager.SetComponentData(particles[i], new ParticleData { Position = positions[i] });
+                if (EntityManager.HasComponent<Translation>(particles[i]))
+                {
+                    EntityManager.SetComponentData(particles[i], new Translation { Value = positions[i] });
+                }
             }
             positions.Dispose();
             particles.Dispose();
