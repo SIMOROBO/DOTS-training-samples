@@ -49,7 +49,7 @@ public class ParticleDrawcallSystem : ComponentSystem
                 m_particleDrawcall.ArgsBuffer);
         }
 
-        t.Dispose();
+        transforms.Dispose();
 
     }
 }

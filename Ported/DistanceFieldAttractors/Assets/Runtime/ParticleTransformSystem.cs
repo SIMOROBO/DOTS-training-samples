@@ -40,6 +40,8 @@ public class ParticleTransformSystem : JobComponentSystem
 
             }).Run();
         }
+
+        particleManagerDatas.Dispose();
         return default;
     }
 }
