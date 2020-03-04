@@ -8,9 +8,9 @@ public struct ParticleManagerData : IComponentData
 {
     public float Attraction;
     public float Jitter;
-    public Color SurfaceColor;
-    public Color InteriorColor;
-    public Color ExteriorColor;
+    public float3 SurfaceColor;
+    public float3 InteriorColor;
+    public float3 ExteriorColor;
     public float ExteriorColorDist;
     public float InteriorColorDist;
     public float ColorStiffness;
@@ -65,9 +65,9 @@ public class ParticleManagerDataAuthoring : MonoBehaviour, IConvertGameObjectToE
         {
             Attraction = attraction,
             Jitter = jitter,
-            SurfaceColor = surfaceColor,
-            InteriorColor = interiorColor,
-            ExteriorColor = exteriorColor,
+            SurfaceColor = new float3(surfaceColor.r, surfaceColor.g, surfaceColor.b),
+            InteriorColor = new float3(interiorColor.r, interiorColor.g, interiorColor.b),
+            ExteriorColor = new float3(exteriorColor.r, exteriorColor.g, exteriorColor.b),
             ExteriorColorDist = exteriorColorDist,
             InteriorColorDist = interiorColorDist,
             ColorStiffness = colorStiffness,

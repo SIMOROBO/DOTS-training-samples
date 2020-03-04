@@ -20,9 +20,16 @@ public class ParticleSimulationSystem : JobComponentSystem
     {
         public DistanceFieldModels Model;
         public float Time;
+        public float DeltaTime;
         public Random Rnd;
         public float Attraction;
         public float Jitter;
+        public float3 InteriorColor;
+        public float3 ExteriorColor;
+        public float3 SurfaceColor;
+        public float InteriorColorDist;
+        public float ExteriorColorDist;
+        public float ColorStiffness;
 
         // Smooth-Minimum, from Media Molecule's "Dreams"
         float SmoothMin(float a, float b, float radius)
@@ -136,8 +143,8 @@ public class ParticleSimulationSystem : JobComponentSystem
 
         public void Execute(ref ParticleData particleData, ref MaterialData materialData, ref Translation translation)
         {
-            //var position = particleData.Position;
-            var position = translation.Value;
+            var position = particleData.Position;
+            //var position = translation.Value;
             var velocity = particleData.Velocity;
 
             float dist = GetDistance(position.x, position.y, position.z, out float3 normal);
@@ -146,8 +153,19 @@ public class ParticleSimulationSystem : JobComponentSystem
             velocity *= 0.99f;
             position += velocity;
 
+            float3 targetColor;
+            if (dist > 0f)
+            {
+                targetColor = math.lerp(SurfaceColor, ExteriorColor, dist / ExteriorColorDist);
+            }
+            else
+            {
+                targetColor = math.lerp(SurfaceColor, InteriorColor, -dist / InteriorColorDist);
+            }
+
+            materialData.Color = math.lerp(materialData.Color, targetColor, DeltaTime * ColorStiffness);
             particleData.Position = position;
-            translation.Value = position;
+            //translation.Value = position;
             particleData.Velocity = velocity;
         }
 
@@ -162,9 +180,15 @@ public class ParticleSimulationSystem : JobComponentSystem
         {
             Model = distanceFieldData.Model,
             Time = (float)distanceFieldData.ElapsedTime,
+            DeltaTime = Time.DeltaTime,
             Rnd = new Random(123),
             Attraction = particleManagerData.Attraction,
             Jitter = particleManagerData.Jitter,
+            InteriorColor = particleManagerData.InteriorColor,
+            ExteriorColor = particleManagerData.ExteriorColor,
+            SurfaceColor = particleManagerData.SurfaceColor,
+            InteriorColorDist = particleManagerData.InteriorColorDist,
+            ExteriorColorDist = particleManagerData.ExteriorColorDist,
         };
         
         var particleHandle = particleSimulationJob.Schedule(this, inputDeps);
