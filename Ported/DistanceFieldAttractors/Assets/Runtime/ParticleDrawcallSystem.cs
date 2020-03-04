@@ -5,7 +5,7 @@ using Unity.Jobs;
 using Unity.Transforms;
 using UnityEngine;
 
-[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateInGroup(typeof(PresentationSystemGroup))]
 public class ParticleDrawcallSystem : ComponentSystem
 {
     EntityQuery m_query;
