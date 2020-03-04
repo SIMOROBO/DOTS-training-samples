@@ -14,26 +14,27 @@ public struct ParticleManagerData : IComponentData
     public float ExteriorColorDist;
     public float InteriorColorDist;
     public float ColorStiffness;
+    public float SpeedStretch;
 }
 
 [Serializable]
 public struct ParticleManagerSharedData : ISharedComponentData, IEquatable<ParticleManagerSharedData>
 {
-    public float SpeedStretch;
+    
     public Mesh ParticleMesh;
     public Material ParticleMaterial;
 
     public bool Equals(ParticleManagerSharedData other)
     {
         return
-            SpeedStretch == other.SpeedStretch &&
+            //SpeedStretch == other.SpeedStretch &&
             ReferenceEquals(ParticleMesh, other.ParticleMesh) &&
             ReferenceEquals(ParticleMaterial, other.ParticleMaterial);
     }
 
     public override int GetHashCode()
     {
-        int hash = SpeedStretch.GetHashCode();
+        int hash = 0;
         if (!ReferenceEquals(ParticleMesh, null))
             hash ^= ParticleMesh.GetHashCode();
         if (!ReferenceEquals(ParticleMaterial, null))
@@ -71,10 +72,11 @@ public class ParticleManagerDataAuthoring : MonoBehaviour, IConvertGameObjectToE
             ExteriorColorDist = exteriorColorDist,
             InteriorColorDist = interiorColorDist,
             ColorStiffness = colorStiffness,
+            SpeedStretch = speedStretch
         });
         dstManager.AddSharedComponentData(entity, new ParticleManagerSharedData
         {
-            SpeedStretch = speedStretch,
+            //SpeedStretch = speedStretch,
             ParticleMesh = particleMesh,
             ParticleMaterial = particleMaterial,
         });

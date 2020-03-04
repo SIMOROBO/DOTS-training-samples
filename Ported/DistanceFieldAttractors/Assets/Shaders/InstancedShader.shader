@@ -19,6 +19,7 @@
 				struct v2f
 				{
 					float4 pos : SV_POSITION;
+                    float4 color : COLOR0;
 				};
 
 				v2f vert(appdata_full v, uint instanceID : SV_InstanceID)
@@ -28,12 +29,18 @@
 
 					v2f o;
 					o.pos = mul(UNITY_MATRIX_VP, float4(worldPosition, 1.0f));
+                    float3 c = float3(
+                                transform[3][0],
+                                transform[3][1],
+                                transform[3][2]);
+
+                    o.color = float4(c,1);
 					return o;
 				}
 
 				fixed4 frag(v2f i) : SV_Target
 				{
-					return fixed4(1,0,0,1);
+					return fixed4(i.color.xyz,1);
 				}
 
 				ENDCG

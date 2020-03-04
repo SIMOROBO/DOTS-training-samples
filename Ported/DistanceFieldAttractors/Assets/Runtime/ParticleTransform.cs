@@ -1,8 +1,9 @@
-﻿using System.Numerics;
+﻿using Unity.Mathematics;
 using Unity.Entities;
+
 
 [GenerateAuthoringComponent]
 public struct ParticleTransform : IComponentData
 {
-    public Matrix4x4 transform;
+    public float4x4 transform;
 }
