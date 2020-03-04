@@ -4,52 +4,40 @@ using Unity.Mathematics;
 using UnityEngine;
 
 [Serializable]
-public struct ParticleManagerData : ISharedComponentData, IEquatable<ParticleManagerData>
+public struct ParticleManagerData : IComponentData
 {
     public float Attraction;
-    public float SpeedStretch;
     public float Jitter;
-    public Mesh ParticleMesh;
-    public Material ParticleMaterial;
     public Color SurfaceColor;
     public Color InteriorColor;
     public Color ExteriorColor;
     public float ExteriorColorDist;
     public float InteriorColorDist;
     public float ColorStiffness;
+}
 
-    public bool Equals(ParticleManagerData other)
+[Serializable]
+public struct ParticleManagerSharedData : ISharedComponentData, IEquatable<ParticleManagerSharedData>
+{
+    public float SpeedStretch;
+    public Mesh ParticleMesh;
+    public Material ParticleMaterial;
+
+    public bool Equals(ParticleManagerSharedData other)
     {
         return
-            Attraction == other.Attraction &&
             SpeedStretch == other.SpeedStretch &&
-            Jitter == other.Jitter &&
             ReferenceEquals(ParticleMesh, other.ParticleMesh) &&
-            ReferenceEquals(ParticleMaterial, other.ParticleMaterial) &&
-            SurfaceColor == other.SurfaceColor &&
-            InteriorColor == other.InteriorColor &&
-            ExteriorColor == other.ExteriorColor &&
-            ExteriorColorDist == other.ExteriorColorDist &&
-            InteriorColorDist == other.InteriorColorDist &&
-            ColorStiffness == other.ColorStiffness;
+            ReferenceEquals(ParticleMaterial, other.ParticleMaterial);
     }
 
     public override int GetHashCode()
     {
-        int hash = Attraction.GetHashCode();
-
-        hash ^= SpeedStretch.GetHashCode();
-        hash ^= Jitter.GetHashCode();
+        int hash = SpeedStretch.GetHashCode();
         if (!ReferenceEquals(ParticleMesh, null))
             hash ^= ParticleMesh.GetHashCode();
         if (!ReferenceEquals(ParticleMaterial, null))
             hash ^= ParticleMaterial.GetHashCode();
-        hash ^= SurfaceColor.GetHashCode();
-        hash ^= InteriorColor.GetHashCode();
-        hash ^= ExteriorColor.GetHashCode();
-        hash ^= ExteriorColorDist.GetHashCode();
-        hash ^= InteriorColorDist.GetHashCode();
-        hash ^= ExteriorColorDist.GetHashCode();
 
         return hash;
     }
@@ -73,19 +61,22 @@ public class ParticleManagerDataAuthoring : MonoBehaviour, IConvertGameObjectToE
 
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
-        dstManager.AddSharedComponentData(entity, new ParticleManagerData
+        dstManager.AddComponentData(entity, new ParticleManagerData
         {
             Attraction = attraction,
-            SpeedStretch = speedStretch,
             Jitter = jitter,
-            ParticleMesh = particleMesh,
-            ParticleMaterial = particleMaterial,
             SurfaceColor = surfaceColor,
             InteriorColor = interiorColor,
             ExteriorColor = exteriorColor,
             ExteriorColorDist = exteriorColorDist,
             InteriorColorDist = interiorColorDist,
             ColorStiffness = colorStiffness,
+        });
+        dstManager.AddSharedComponentData(entity, new ParticleManagerSharedData
+        {
+            SpeedStretch = speedStretch,
+            ParticleMesh = particleMesh,
+            ParticleMaterial = particleMaterial,
         });
         
     }
