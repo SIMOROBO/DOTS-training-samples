@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Burst;
+using System;
 
 
 public class DistanceFieldSelectionSystem : JobComponentSystem
@@ -12,7 +11,7 @@ public class DistanceFieldSelectionSystem : JobComponentSystem
 
     protected override void OnCreate()
     {
-        _ModesCount = DistanceFieldModels.GetNames(typeof(DistanceFieldModels)).Length;
+        _ModesCount = Enum.GetNames(typeof(DistanceFieldModels)).Length;
     }
 
     [BurstCompile]
