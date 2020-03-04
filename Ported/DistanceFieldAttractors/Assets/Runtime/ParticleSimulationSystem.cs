@@ -189,6 +189,7 @@ public class ParticleSimulationSystem : JobComponentSystem
             SurfaceColor = particleManagerData.SurfaceColor,
             InteriorColorDist = particleManagerData.InteriorColorDist,
             ExteriorColorDist = particleManagerData.ExteriorColorDist,
+            ColorStiffness = particleManagerData.ColorStiffness,
         };
         
         var particleHandle = particleSimulationJob.Schedule(this, inputDeps);
