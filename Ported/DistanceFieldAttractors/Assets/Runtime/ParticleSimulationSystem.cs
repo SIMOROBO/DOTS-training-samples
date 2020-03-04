@@ -10,7 +10,8 @@ using Unity.Transforms;
 using UnityEngine;
 using Random = Unity.Mathematics.Random;
 
-[AlwaysUpdateSystem]
+//[AlwaysUpdateSystem]
+[DisableAutoCreation]
 public class ParticleSimulationSystem : JobComponentSystem
 {
     //private EntityQuery m_ParticleQuery;
@@ -168,6 +169,7 @@ public class ParticleSimulationSystem : JobComponentSystem
         };
         
         var particleHandle = particleSimulationJob.Schedule(this);
+        particleHandle.Complete();
         return particleHandle;
         //return inputDeps;
     }
