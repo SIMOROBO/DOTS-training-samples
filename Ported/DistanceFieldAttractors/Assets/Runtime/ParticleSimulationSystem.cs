@@ -142,9 +142,8 @@ public class ParticleSimulationSystem : JobComponentSystem
 
             float dist = GetDistance(position.x, position.y, position.z, out float3 normal);
             velocity -= math.normalize(normal) * attraction * math.clamp(dist, -1f, 1f);
-            velocity += Rnd.NextFloat3Direction() * jitter;
+            velocity += Rnd.NextFloat3Direction() * Rnd.NextFloat() * jitter;
             velocity *= 0.99f;
-            velocity = new float3(dist, 0, 0);
             position += velocity;
 
             particleData.Position = position;
@@ -159,7 +158,7 @@ public class ParticleSimulationSystem : JobComponentSystem
         //var particleCount = m_ParticleQuery.CalculateEntityCount();
         var particleSimulationJob = new ParticleSimulationJob
         {
-            Model = DistanceFieldModel.Metaballs,
+            Model = DistanceFieldModel.FigureEight,
             Time = Time.DeltaTime,
             Rnd = new Random(123),
         };
