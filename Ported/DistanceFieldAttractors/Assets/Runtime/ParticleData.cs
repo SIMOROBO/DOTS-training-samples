@@ -1,12 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Unity.Entities;
+﻿using Unity.Entities;
+using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
-public class ParticleData : IComponentData
+public struct ParticleData : IComponentData
 {
-	public Vector3 position;
-	public Vector3 velocity;
-	public Vector4 color;
+    public float3 Position;
+    public float3 Velocity;
 }
