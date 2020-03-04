@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6528619423295755174}
-  - component: {fileID: 6528619423295755173}
+  - component: {fileID: 7666783445537636117}
   - component: {fileID: 6528619423295755175}
   m_Layer: 0
   m_Name: DistanceFieldMode
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6528619423295755173
+--- !u!114 &7666783445537636117
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6528619423295755172}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 361fa0effe1f140d8b6da8f44f747c00, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b805286b29a64f278c08471d6bc36e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Model: 0
