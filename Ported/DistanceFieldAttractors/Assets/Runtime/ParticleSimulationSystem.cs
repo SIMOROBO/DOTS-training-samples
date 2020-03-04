@@ -20,6 +20,8 @@ public class ParticleSimulationSystem : JobComponentSystem
         public DistanceFieldModels Model;
         public float Time;
         public Random Rnd;
+        public float Attraction;
+        public float Jitter;
 
         // Smooth-Minimum, from Media Molecule's "Dreams"
         float SmoothMin(float a, float b, float radius)
@@ -137,12 +139,9 @@ public class ParticleSimulationSystem : JobComponentSystem
             var position = translation.Value;
             var velocity = particleData.Velocity;
 
-            var attraction = 0.4f;
-            var jitter = 0.1f;
-
             float dist = GetDistance(position.x, position.y, position.z, out float3 normal);
-            velocity -= math.normalize(normal) * attraction * math.clamp(dist, -1f, 1f);
-            velocity += Rnd.NextFloat3Direction() * Rnd.NextFloat() * jitter;
+            velocity -= math.normalize(normal) * Attraction * math.clamp(dist, -1f, 1f);
+            velocity += Rnd.NextFloat3Direction() * Rnd.NextFloat() * Jitter;
             velocity *= 0.99f;
             position += velocity;
 
@@ -156,6 +155,7 @@ public class ParticleSimulationSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         var distanceFieldData = GetSingleton<DistanceFieldModeData>();
+        var particleManagerData = GetSingleton<ParticleManagerData>();
 
         //var particleCount = m_ParticleQuery.CalculateEntityCount();
         var particleSimulationJob = new ParticleSimulationJob
@@ -163,6 +163,8 @@ public class ParticleSimulationSystem : JobComponentSystem
             Model = distanceFieldData.Model,
             Time = (float)distanceFieldData.ElapsedTime,
             Rnd = new Random(123),
+            Attraction = particleManagerData.Attraction,
+            Jitter = particleManagerData.Jitter,
         };
         
         var particleHandle = particleSimulationJob.Schedule(this);
