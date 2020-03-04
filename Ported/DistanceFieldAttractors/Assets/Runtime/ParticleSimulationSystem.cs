@@ -158,7 +158,6 @@ public class ParticleSimulationSystem : JobComponentSystem
         var distanceFieldData = GetSingleton<DistanceFieldModeData>();
         var particleManagerData = GetSingleton<ParticleManagerData>();
 
-        //var particleCount = m_ParticleQuery.CalculateEntityCount();
         var particleSimulationJob = new ParticleSimulationJob
         {
             Model = distanceFieldData.Model,
@@ -168,10 +167,10 @@ public class ParticleSimulationSystem : JobComponentSystem
             Jitter = particleManagerData.Jitter,
         };
         
-        var particleHandle = particleSimulationJob.Schedule(this);
+        var particleHandle = particleSimulationJob.Schedule(this, inputDeps);
         particleHandle.Complete();
+
         return particleHandle;
-        //return inputDeps;
     }
 
     //protected override void OnCreate()
