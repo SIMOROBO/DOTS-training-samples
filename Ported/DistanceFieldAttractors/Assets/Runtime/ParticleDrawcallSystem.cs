@@ -10,6 +10,7 @@ public class ParticleDrawcallSystem : ComponentSystem
 {
     EntityQuery m_query;
     ParticleDrawCall m_particleDrawcall;
+    List<ParticleManagerSharedData> m_particleData = new List<ParticleManagerSharedData>(2);
 
     protected override void OnCreate()
     {
@@ -18,32 +19,36 @@ public class ParticleDrawcallSystem : ComponentSystem
 
     protected override void OnUpdate()
     {
+
         var transforms = m_query.ToComponentDataArray<ParticleTransform>(Unity.Collections.Allocator.TempJob);
         var t = transforms.Reinterpret<Matrix4x4>();
-        
-        var shader = Shader.Find("Instanced/InstancedShader");
-        if (shader != null)
+
+        EntityManager.GetAllUniqueSharedComponentData(m_particleData);
+        if (m_particleData.Count == 0)
         {
-            Material material = new Material(shader);
-            Mesh mesh = PrimitiveHelper.GetPrimitiveMesh(PrimitiveType.Cube);
-            
-            if (material != null && mesh != null && t != null)
-            {
-                if(m_particleDrawcall != null)
-                {
-                    m_particleDrawcall.Release();
-                }
-
-                m_particleDrawcall = DrawCallGenerator.GetDrawCall(mesh, material, t);
-
-                Graphics.DrawMeshInstancedIndirect(
-                    m_particleDrawcall.Mesh,
-                    m_particleDrawcall.SubMeshIndex,
-                    m_particleDrawcall.Material,
-                    m_particleDrawcall.Bounds,
-                    m_particleDrawcall.ArgsBuffer);
-            }
+            return;
         }
+
+        var material = m_particleData[1].ParticleMaterial;
+        var mesh = m_particleData[1].ParticleMesh;
+
+        if (material != null && mesh != null && t != null)
+        {
+            if (m_particleDrawcall != null)
+            {
+                m_particleDrawcall.Release();
+            }
+
+            m_particleDrawcall = DrawCallGenerator.GetDrawCall(mesh, material, t);
+
+            Graphics.DrawMeshInstancedIndirect(
+                m_particleDrawcall.Mesh,
+                m_particleDrawcall.SubMeshIndex,
+                m_particleDrawcall.Material,
+                m_particleDrawcall.Bounds,
+                m_particleDrawcall.ArgsBuffer);
+        }
+
         t.Dispose();
 
     }

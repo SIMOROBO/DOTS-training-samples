@@ -579,6 +579,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3873398599364873654, guid: f31beb50986f641e3ad863037f99c578,
+        type: 3}
+      propertyPath: particleMesh
+      value: 
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+    - target: {fileID: 3873398599364873654, guid: f31beb50986f641e3ad863037f99c578,
+        type: 3}
+      propertyPath: particleMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 1e5d6d6076e23f04e9d0eadb30c357ca, type: 2}
     - target: {fileID: 6528619423295755172, guid: f31beb50986f641e3ad863037f99c578,
         type: 3}
       propertyPath: m_Name
