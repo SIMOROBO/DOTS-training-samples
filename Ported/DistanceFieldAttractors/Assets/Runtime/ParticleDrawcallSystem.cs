@@ -50,6 +50,13 @@ public class ParticleDrawcallSystem : ComponentSystem
         }
 
         transforms.Dispose();
+    }
 
+    protected override void OnDestroy()
+    {
+        if (m_particleDrawcall != null)
+        {
+            m_particleDrawcall.Release();
+        }
     }
 }
