@@ -9,6 +9,7 @@ using UnityEngine;
 public class ParticleDrawcallSystem : ComponentSystem
 {
     EntityQuery m_query;
+    ParticleDrawCall m_particleDrawcall;
 
     protected override void OnCreate()
     {
@@ -19,6 +20,7 @@ public class ParticleDrawcallSystem : ComponentSystem
     {
         var transforms = m_query.ToComponentDataArray<ParticleTransform>(Unity.Collections.Allocator.TempJob);
         var t = transforms.Reinterpret<Matrix4x4>();
+        
         var shader = Shader.Find("Instanced/InstancedShader");
         if (shader != null)
         {
@@ -27,8 +29,19 @@ public class ParticleDrawcallSystem : ComponentSystem
             
             if (material != null && mesh != null && t != null)
             {
-                var _drawcall = DrawCallGenerator.GetDrawCall(mesh, material, t);
-                Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);
+                if(m_particleDrawcall != null)
+                {
+                    m_particleDrawcall.Release();
+                }
+
+                m_particleDrawcall = DrawCallGenerator.GetDrawCall(mesh, material, t);
+
+                Graphics.DrawMeshInstancedIndirect(
+                    m_particleDrawcall.Mesh,
+                    m_particleDrawcall.SubMeshIndex,
+                    m_particleDrawcall.Material,
+                    m_particleDrawcall.Bounds,
+                    m_particleDrawcall.ArgsBuffer);
             }
         }
         t.Dispose();
