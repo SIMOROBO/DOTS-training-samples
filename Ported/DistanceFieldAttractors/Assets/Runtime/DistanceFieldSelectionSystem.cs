@@ -42,7 +42,7 @@ public class DistanceFieldSelectionSystem : JobComponentSystem
             var currentMode = (int)mode;
             var time = distanceField.ElapsedTime + deltatime;
 
-            if (time >= 10 || Input.GetKey(distanceField.ChangeModeKey))
+            if (time >= 10 || Input.GetKeyUp(distanceField.ChangeModeKey))
             {
                 currentMode += 1;
                 
