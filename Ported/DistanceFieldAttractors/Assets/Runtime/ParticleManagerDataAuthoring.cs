@@ -38,26 +38,18 @@ public struct ParticleManagerData : ISharedComponentData, IEquatable<ParticleMan
     {
         int hash = Attraction.GetHashCode();
 
-        //if (!ReferenceEquals(SpeedStretch, null))
-            hash ^= SpeedStretch.GetHashCode();
-        //if (!ReferenceEquals(Jitter, null))
-            hash ^= Jitter.GetHashCode();
+        hash ^= SpeedStretch.GetHashCode();
+        hash ^= Jitter.GetHashCode();
         if (!ReferenceEquals(ParticleMesh, null))
             hash ^= ParticleMesh.GetHashCode();
         if (!ReferenceEquals(ParticleMaterial, null))
             hash ^= ParticleMaterial.GetHashCode();
-        //if (!ReferenceEquals(SurfaceColor, null))
-            hash ^= SurfaceColor.GetHashCode();
-        //if (!ReferenceEquals(InteriorColor, null))
-            hash ^= InteriorColor.GetHashCode();
-        //if (!ReferenceEquals(ExteriorColor, null))
-            hash ^= ExteriorColor.GetHashCode();
-        //if (!ReferenceEquals(ExteriorColorDist, null))
-            hash ^= ExteriorColorDist.GetHashCode();
-        //if (!ReferenceEquals(InteriorColorDist, null))
-            hash ^= InteriorColorDist.GetHashCode();
-        //if (!ReferenceEquals(ColorStiffness, null))
-            hash ^= ExteriorColorDist.GetHashCode();
+        hash ^= SurfaceColor.GetHashCode();
+        hash ^= InteriorColor.GetHashCode();
+        hash ^= ExteriorColor.GetHashCode();
+        hash ^= ExteriorColorDist.GetHashCode();
+        hash ^= InteriorColorDist.GetHashCode();
+        hash ^= ExteriorColorDist.GetHashCode();
 
         return hash;
     }
