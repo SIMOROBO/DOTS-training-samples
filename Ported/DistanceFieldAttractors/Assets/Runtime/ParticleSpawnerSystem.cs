@@ -26,6 +26,7 @@ public class ParticleSpawnerSystem : JobComponentSystem
             for (var i = 0; i < spawner.Count; i++)
             {
                 EntityManager.SetComponentData(particles[i], new Translation { Value = positions[i] });
+                EntityManager.SetComponentData(particles[i], new ParticleData { Position = positions[i] });
             }
             positions.Dispose();
             particles.Dispose();
