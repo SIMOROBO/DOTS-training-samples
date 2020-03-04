@@ -17,7 +17,7 @@ public class ParticleSimulationSystem : JobComponentSystem
     [BurstCompile]
     struct ParticleSimulationJob : IJobForEach<ParticleData, MaterialData, Translation>
     {
-        public DistanceFieldModel Model;
+        public DistanceFieldModels Model;
         public float Time;
         public Random Rnd;
 
@@ -39,7 +39,7 @@ public class ParticleSimulationSystem : JobComponentSystem
 
             float distance = float.MaxValue;
             normal = float3.zero;
-            if (Model == DistanceFieldModel.Metaballs)
+            if (Model == DistanceFieldModels.Metaballs)
             {
                 for (int i = 0; i < 5; i++)
                 {
@@ -59,7 +59,7 @@ public class ParticleSimulationSystem : JobComponentSystem
                     }
                 }
             }
-            else if (Model == DistanceFieldModel.SpinMixer)
+            else if (Model == DistanceFieldModels.SpinMixer)
             {
                 for (int i = 0; i < 6; i++)
                 {
@@ -77,7 +77,7 @@ public class ParticleSimulationSystem : JobComponentSystem
                     }
                 }
             }
-            else if (Model == DistanceFieldModel.SpherePlane)
+            else if (Model == DistanceFieldModels.SpherePlane)
             {
                 float sphereDist = Sphere(x, y, z, 5f);
                 float3 sphereNormal = math.normalize(new float3(x, y, z));
@@ -89,7 +89,7 @@ public class ParticleSimulationSystem : JobComponentSystem
                 distance = math.lerp(sphereDist, planeDist, t);
                 normal = math.lerp(sphereNormal, planeNormal, t);
             }
-            else if (Model == DistanceFieldModel.SphereField)
+            else if (Model == DistanceFieldModels.SphereField)
             {
                 float spacing = 5f + math.sin(Time * 5f) * 2f;
                 x += spacing * 0.5f;
@@ -104,7 +104,7 @@ public class ParticleSimulationSystem : JobComponentSystem
                 distance = Sphere(x, y, z, 5f);
                 normal = new float3(x, y, z);
             }
-            else if (Model == DistanceFieldModel.FigureEight)
+            else if (Model == DistanceFieldModels.FigureEight)
             {
                 float ringRadius = 4f;
                 float flipper = 1f;
@@ -121,7 +121,7 @@ public class ParticleSimulationSystem : JobComponentSystem
                 wave *= wave * 0.5f;
                 distance = math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z) - (0.5f + wave);
             }
-            else if (Model == DistanceFieldModel.PerlinNoise)
+            else if (Model == DistanceFieldModels.PerlinNoise)
             {
                 float perlin = noise.cnoise(new float2(x * 0.2f, z * 0.2f));
                 distance = y - perlin * 6f;
@@ -155,11 +155,13 @@ public class ParticleSimulationSystem : JobComponentSystem
 
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
+        var distanceFieldData = GetSingleton<DistanceFieldModeData>();
+
         //var particleCount = m_ParticleQuery.CalculateEntityCount();
         var particleSimulationJob = new ParticleSimulationJob
         {
-            Model = DistanceFieldModel.FigureEight,
-            Time = Time.DeltaTime,
+            Model = distanceFieldData.Model,
+            Time = (float)distanceFieldData.ElapsedTime,
             Rnd = new Random(123),
         };
         
