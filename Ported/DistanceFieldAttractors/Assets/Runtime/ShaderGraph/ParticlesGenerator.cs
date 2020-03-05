@@ -1,6 +1,4 @@
-﻿using Unity.Collections;
-using UnityEngine;
-using UnityEngine.Rendering;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter))]
 public class ParticlesGenerator : MonoBehaviour
