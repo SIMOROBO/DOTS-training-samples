@@ -87,9 +87,10 @@ public class ParticleSimulationSystem : JobComponentSystem
             {
                 var orbitRadius = (i / 2 + 2) * 2;
                 var anglea = Time * 20f * (1f + i * 0.1f);
+                var sinAngle = math.sin(anglea);
                 var cx = math.cos(anglea) * orbitRadius;
-                var cy = math.sin(anglea);
-                var cz = math.sin(anglea) * orbitRadius;
+                var cy = sinAngle;
+                var cz = sinAngle * orbitRadius;
 
                 var newDist = Sphere(x - cx, y - cy, z - cz, 2f);
 
