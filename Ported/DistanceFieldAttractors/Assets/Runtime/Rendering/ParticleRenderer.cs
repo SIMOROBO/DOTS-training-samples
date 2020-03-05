@@ -16,6 +16,10 @@ public class ParticleRenderer : MonoBehaviour
             //_drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 4096);
             _drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 32768);
         }
+        if(!_drawcall.IsInitialized)
+        {
+            _drawcall.Initialize();
+        }
     }
 
     private void Update()
