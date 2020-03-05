@@ -1,0 +1,43 @@
+#include "CommonParticleComputeShader.compute"
+
+SimOutput SpinMixerJob(float3 pos)
+{
+    SimOutput simOutput;
+    float dist = 9999999.9f;
+    float3 normal = 0;
+
+    float x = pos.x;
+    float y = pos.y;
+    float z = pos.z;
+
+
+    [unroll(6)]
+    for (int i = 0; i < 6; i++)
+    {
+        float orbitRadius = (i / 2.0 + 2.0) * 2.0;
+        float angle = gTime * 20.0f * (1.0f + i * 0.1f);
+        float sinAngle = sin(angle);
+        float cx = cos(angle) * orbitRadius;
+        float cy = sinAngle;
+        float cz = sinAngle * orbitRadius;
+
+        float newDist = Sphere(float3(x - cx, y - cy, z - cz), 2.0f);
+
+        if (newDist < dist)
+        {
+            normal = float3(x - cx, y - cy, z - cz);
+            dist = newDist;
+        }
+    }
+
+    simOutput.dist = dist;
+    simOutput.normal = normal;
+
+    return simOutput;
+}
+
+
+SimOutput RunSim1(int index)
+{
+    return SpinMixerJob(FixedUpdateBuffer[index].position);
+}
