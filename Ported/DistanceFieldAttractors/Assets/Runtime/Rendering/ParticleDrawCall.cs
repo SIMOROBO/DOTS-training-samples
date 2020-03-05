@@ -11,6 +11,7 @@ public class ParticleDrawCall
     public ComputeBuffer FixedUpdateBuffer { get; set; }
     public ComputeShader ComputeShader { get; set; }    
     public uint Count { get; set; }
+    public ParticleRenderer.SimulationParams SimulationParams { get; set; }
     public bool IsInitialized { get; set; }
 
     public void Initialize()
@@ -84,6 +85,15 @@ public class ParticleDrawCall
                 ComputeShader.SetInt("gInstancesCount", (int)Count);
                 ComputeShader.SetInt("gInstancesPerRow", (int)instancesPerRow);
                 ComputeShader.SetFloat("gTime", Time.realtimeSinceStartup * 0.3f);
+                ComputeShader.SetFloat("gAttraction", SimulationParams.attraction);
+                ComputeShader.SetFloat("gJitter", SimulationParams.jitter);
+                ComputeShader.SetFloat("gInteriorColorDist", SimulationParams.interiorColorDist);
+                ComputeShader.SetFloat("gExteriorColorDist", SimulationParams.exteriorColorDist);
+                ComputeShader.SetFloat("gColorStiffness", SimulationParams.colorStiffness);
+                ComputeShader.SetFloat("gSpeedStretch", SimulationParams.speedStretch);
+                ComputeShader.SetVector("gSurfaceColor", new Vector4(SimulationParams.surfaceColor.r, SimulationParams.surfaceColor.g, SimulationParams.surfaceColor.b, 1.0f));
+                ComputeShader.SetVector("gInteriorColor", new Vector4(SimulationParams.interiorColor.r, SimulationParams.interiorColor.g, SimulationParams.interiorColor.b, 1.0f));
+                ComputeShader.SetVector("gExteriorColor", new Vector4(SimulationParams.exteriorColor.r, SimulationParams.exteriorColor.g, SimulationParams.exteriorColor.b, 1.0f));
                 ComputeShader.Dispatch(kernelIndex, instancesPerRow / 8, instancesPerRow / 8, instancesPerRow / 8);
             }
         }

@@ -1,18 +1,24 @@
+#ifndef COMMONPARTICLECOMPUTESHADER_INCLUDED
+#define COMMONPARTICLECOMPUTESHADER_INCLUDED
+
 #define Kernel_X 8
 #define Kernel_Y 8
 #define Kernel_Z 8
 
+#define GOLDENRATIO 0.618033988749895
+#define PI 3.1415926535897932384626433
+
 struct FixedUpdateData
 {
-	float3 position;
-	float3 color;
-	float3 velocity;
+    float3 position;
+    float3 velocity;
+    float3 color;
 };
 
 struct SimOutput
 {
-  float3 normal;
-  float dist;
+    float3 normal;
+    float dist;
 };
 
 RWStructuredBuffer<float4x4> TransformsBuffer;
@@ -21,13 +27,91 @@ RWStructuredBuffer<FixedUpdateData> FixedUpdateBuffer;
 uint gInstancesCount;
 uint gInstancesPerRow;
 float gTime;
-#define PI 3.1415926535897932384626433
+
+float gAttraction;
+float gJitter;
+float gInteriorColorDist;
+float gExteriorColorDist;
+float gColorStiffness;
+float gSpeedStretch;
+float4 gSurfaceColor;
+float4 gInteriorColor;
+float4 gExteriorColor;
 
 uint GetParticleIndex(uint3 groupId, uint groupIndex)
 {
-	uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
-	//uint threadGroupIndex = (groupId.x * (groupSize * 4)) + groupId.y * (groupSize *2)+ (groupId.z * groupSize);  // 4096
-	uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
-	uint index = threadGroupIndex + groupIndex;
-	return index;
+    uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
+    //uint threadGroupIndex = (groupId.x * (groupSize * 4)) + groupId.y * (groupSize *2)+ (groupId.z * groupSize);  // 4096
+    uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
+    uint index = threadGroupIndex + groupIndex;
+    return index;
 }
+
+float3 safenormalize(float3 v)
+{
+    return normalize(v == 0 ? float3(0, 1, 0) : v);
+}
+
+float SmoothMin(float a, float b, float radius)
+{
+    float e = max(radius - abs(a - b), 0);
+    return min(a, b) - e * e * 0.25f / radius;
+}
+
+float Sphere(float3 pos, float radius)
+{
+    return sqrt(dot(pos, pos)) - radius;
+}
+
+float rand_1_05(float2 uv)
+{
+    float2 noise = frac(sin(dot(uv, float2(12.9898, 78.233) * 2.0)) * 43758.5453);
+
+    return abs(noise.x + noise.y) * 0.5;
+}
+
+float rand_float(float2 uv)
+{
+    return rand_1_05(uv);
+}
+
+float3 rand_dir(float2 uv)
+{
+    float2 uv2 = float2(uv.x + GOLDENRATIO, uv.y + GOLDENRATIO);
+    float2 uv3 = float2(uv.x + 2.0 * GOLDENRATIO, uv.y + 2.0 * GOLDENRATIO);
+    float3 dir = float3(rand_float(uv) * 2.0f - 1.0f, rand_float(uv2) * 2.0f - 1.0f, rand_float(uv3) * 2.0f - 1.0f);
+
+    return safenormalize(dir);
+}
+
+FixedUpdateData ComputeParticleData(int index, float3 normal, float dist)
+{
+    FixedUpdateData data = FixedUpdateBuffer[index];
+    float3 position = data.position;
+    float3 velocity = data.velocity;
+    float3 color = data.color;
+
+    velocity -= safenormalize(normal) * gAttraction * clamp(dist, -1.0f, 1.0f);
+    velocity += rand_dir(float2(index, gTime)) * rand_float(float2(index, gTime + 1.0f)) * gJitter;
+    velocity *= 0.99f;
+    position += velocity;
+
+    float3 targetColor;
+    if (dist > 0.0f)
+    {
+        targetColor = lerp(gSurfaceColor.xyz, gExteriorColor.xyz, dist / gExteriorColorDist);
+    }
+    else
+    {
+        targetColor = lerp(gSurfaceColor.xyz, gInteriorColor.xyz, -dist / gInteriorColorDist);
+    }
+    color = lerp(color, targetColor, 0.02 * gColorStiffness);
+
+    data.position = position;
+    data.velocity = velocity;
+    data.color = color;
+
+    return data;
+}
+
+#endif

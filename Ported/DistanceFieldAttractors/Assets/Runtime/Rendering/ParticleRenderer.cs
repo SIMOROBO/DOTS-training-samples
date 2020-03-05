@@ -1,20 +1,37 @@
-﻿using Unity.Collections;
+﻿using System;
+using Unity.Collections;
 using UnityEngine;
+
 
 [ExecuteAlways]
 public class ParticleRenderer : MonoBehaviour
 {
+    [System.Serializable]
+    public struct SimulationParams
+    {
+        public float attraction;
+        public float jitter;
+        public Color surfaceColor;
+        public Color interiorColor;
+        public Color exteriorColor;
+        public float interiorColorDist;
+        public float exteriorColorDist;
+        public float colorStiffness;
+        public float speedStretch;
+    }
+
     public Mesh _mesh;
     public Material _material;
     private ParticleDrawCall _drawcall;
     public ComputeShader _computeShader;
+    public SimulationParams simulationParams;
 
     public void Restart()
     {
         if (_drawcall == null && _mesh != null && _material != null)
         {
             //_drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 4096);
-            _drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 32768);
+            _drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 32768, simulationParams);
         }
         if(!_drawcall.IsInitialized)
         {
@@ -49,7 +66,7 @@ public class ParticleRenderer : MonoBehaviour
 
         if (_drawcall != null)
         {
-            Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);            
+            Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);
         }
     }
 
@@ -83,4 +100,8 @@ public class ParticleRenderer : MonoBehaviour
             _drawcall = null;
         }
     }
+}
+
+internal class serializeableAttribute : Attribute
+{
 }
