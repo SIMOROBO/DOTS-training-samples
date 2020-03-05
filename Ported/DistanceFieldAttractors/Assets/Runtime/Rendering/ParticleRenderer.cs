@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
+﻿using Unity.Collections;
 using UnityEngine;
 
 [ExecuteAlways]
@@ -11,9 +9,30 @@ public class ParticleRenderer : MonoBehaviour
     private ParticleDrawCall _drawcall;
     public ComputeShader _computeShader;
 
-    void Update()
+    public void Restart()
     {
-        DrawComputeParticles();
+        if (_drawcall == null && _mesh != null && _material != null)
+        {
+            //_drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 4096);
+            _drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 32768);
+        }
+    }
+
+    private void Update()
+    {
+        if (_drawcall != null)
+        {
+            _drawcall.Update();
+            Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (_drawcall != null)
+        {
+            _drawcall.FixedUpdate();
+        }
     }
 
     private void DrawParticles()
@@ -27,22 +46,6 @@ public class ParticleRenderer : MonoBehaviour
         if (_drawcall != null)
         {
             Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);            
-        }
-    }
-
-    private void DrawComputeParticles()
-    {
-        if (_drawcall == null && _mesh != null && _material != null)
-        {
-            //_drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 4096);
-            _drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 32768);
-
-        }
-
-        if (_drawcall != null)
-        {
-            _drawcall.Update();
-            Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);
         }
     }
 
