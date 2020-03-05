@@ -1,13 +1,34 @@
-#ifndef ParticleCommonIncluded
 #include "CommonParticleComputeShader.compute"
-#define ParticleCommonIncluded
-#endif
 
+SimOutput SimulationMetaballs(float3 pos)
+{
+    SimOutput simOutput;
+    float dist = 9999999.9f;
+    float3 normal = 0;
+
+    [unroll(5)]
+    for (int i = 0; i < 5; i++)
+    {
+        float orbitRadius = i * 0.5f + 2.0f;
+        float angle1 = gTime * 4.0f * (1.0f + i * 0.1f);
+        float angle2 = gTime * 4.0f * (1.2f + i * 0.117f);
+        float angle3 = gTime * 4.0f * (1.3f + i * 0.1618f);
+        float cx = cos(angle1) * orbitRadius;
+        float cy = sin(angle2) * orbitRadius;
+        float cz = sin(angle3) * orbitRadius;
+
+        float newDist = SmoothMin(dist, Sphere(float3(pos.x - cx, pos.y - cy, pos.z - cz), 2.0f), 2.0f);
+        normal = newDist < dist ? float3(pos.x - cx, pos.y - cy, pos.z - cz) : normal;
+        dist = min(newDist, dist);
+    }
+
+    simOutput.dist = dist;
+    simOutput.normal = normal;
+
+    return simOutput;
+}
 
 SimOutput RunSim0(int index)
 {
-  SimOutput simOutput;
-  simOutput.normal = float3(0,1,0);
-  simOutput.dist = 1;
-  return simOutput;
+    return SimulationMetaballs(FixedUpdateBuffer[index].position);
 }
