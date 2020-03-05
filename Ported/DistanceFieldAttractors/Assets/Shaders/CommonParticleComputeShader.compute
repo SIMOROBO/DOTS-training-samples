@@ -1,0 +1,33 @@
+#define Kernel_X 8
+#define Kernel_Y 8
+#define Kernel_Z 8
+
+struct FixedUpdateData
+{
+	float3 position;
+	float3 color;
+	float3 velocity;
+};
+
+struct SimOutput
+{
+  float3 normal;
+  float dist;
+};
+
+RWStructuredBuffer<float4x4> TransformsBuffer;
+RWStructuredBuffer<FixedUpdateData> FixedUpdateBuffer;
+
+uint gInstancesCount;
+uint gInstancesPerRow;
+float gTime;
+#define PI 3.1415926535897932384626433
+
+uint GetParticleIndex(uint3 groupId, uint groupIndex)
+{
+	uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
+	//uint threadGroupIndex = (groupId.x * (groupSize * 4)) + groupId.y * (groupSize *2)+ (groupId.z * groupSize);  // 4096
+	uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
+	uint index = threadGroupIndex + groupIndex;
+	return index;
+}

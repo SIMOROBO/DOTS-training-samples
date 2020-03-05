@@ -75,7 +75,7 @@ public class ParticleDrawCall
     {
         if (IsInitialized && ComputeShader != null)
         {
-            int kernelIndex = ComputeShader.FindKernel("CSFixedUpdate");
+            int kernelIndex = ComputeShader.FindKernel("CSFixedUpdate0");
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));

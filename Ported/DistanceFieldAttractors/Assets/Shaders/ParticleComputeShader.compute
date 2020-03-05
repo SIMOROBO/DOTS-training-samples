@@ -1,59 +1,33 @@
 #pragma kernel CSInitialize
-#pragma kernel CSFixedUpdate
+#pragma kernel CSFixedUpdate0
 #pragma kernel CSUpdate
 #pragma enable_d3d11_debug_symbols
 
-#define Kernel_X 8
-#define Kernel_Y 8
-#define Kernel_Z 8
+#ifndef ParticleCommonIncluded
+#include "CommonParticleComputeShader.compute"
+#define ParticleCommonIncluded
+#endif
 
-struct FixedUpdateData
-{
-	float3 position;
-	float3 color;
-	float3 velocity;
-};
-
-RWStructuredBuffer<float4x4> TransformsBuffer;
-RWStructuredBuffer<FixedUpdateData> FixedUpdateBuffer;
-
-uint gInstancesCount;
-uint gInstancesPerRow;
-float gTime;
-#define PI 3.1415926535897932384626433
+#include "ParticleSimulation_0.compute"
 
 [numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
-void CSFixedUpdate (	uint3 groupId : SV_GroupID,
+void CSFixedUpdate0 (	uint3 groupId : SV_GroupID,
 	uint3 groupThreadId : SV_GroupThreadID,
-	uint3 dispatchThreadId : SV_DispatchThreadID,
 	uint groupIndex : SV_GroupIndex)
 	{
-		uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
-		uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
-		uint index = threadGroupIndex + groupIndex;
-
-    //float4x4 m = TransformsBuffer[index];
-		//float3 pos = float3(m[0][3]
-		FixedUpdateData data = FixedUpdateBuffer[index];
-		data.position *= 1.02;
-		data.color = frac(data.color+0.017);
-		data.velocity = float3(0,0,0);
-		FixedUpdateBuffer[index] = data;
+		uint index = GetParticleIndex(groupId, groupIndex);
+		FixedUpdateBuffer[index] = RunSim0(index);
 	}
 
 [numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
 void CSUpdate (
 	uint3 groupId : SV_GroupID,
 	uint3 groupThreadId : SV_GroupThreadID,
-	uint3 dispatchThreadId : SV_DispatchThreadID,
 	uint groupIndex : SV_GroupIndex)
 {
-	uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
-	uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
-	uint index = threadGroupIndex + groupIndex;
+	uint index = GetParticleIndex(groupId, groupIndex);
 	float3 color = FixedUpdateBuffer[index].color;
 
-	//TransformsBuffer[index][3] =float4(color, 1);
 	FixedUpdateData data = FixedUpdateBuffer[index];
 	float3 pos = data.position;
 	TransformsBuffer[index] =
@@ -72,10 +46,7 @@ void CSInitialize (
 	uint3 dispatchThreadId : SV_DispatchThreadID,
 	uint groupIndex : SV_GroupIndex)
 {
-	uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
-	//uint threadGroupIndex = (groupId.x * (groupSize * 4)) + groupId.y * (groupSize *2)+ (groupId.z * groupSize);  // 4096
-	uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
-	uint index = threadGroupIndex + groupIndex;
+	uint index = GetParticleIndex(groupId, groupIndex);
 	uint3 groupOffset = uint3((groupId.x * (Kernel_X )), groupId.y * (Kernel_X * 1), (groupId.z * Kernel_X));
 	float cosTime = cos(gTime);
 	float spacing = 4 * ((cosTime+1)*.5);

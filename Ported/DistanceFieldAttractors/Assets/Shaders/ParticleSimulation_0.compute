@@ -1,0 +1,14 @@
+#ifndef ParticleCommonIncluded
+#include "CommonParticleComputeShader.compute"
+#define ParticleCommonIncluded
+#endif
+
+
+FixedUpdateData RunSim0(int index)
+{
+  FixedUpdateData data = FixedUpdateBuffer[index];
+  data.position *= 1.02;
+  data.color = frac(data.color+0.017);
+  data.velocity = float3(0,0,0);
+  return data;
+}
