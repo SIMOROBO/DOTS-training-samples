@@ -146,7 +146,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1807567668}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -137.44957, y: 107.42719, z: -164.31082}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -167,6 +167,16 @@ MonoBehaviour:
   _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   _material: {fileID: 2100000, guid: 1e5d6d6076e23f04e9d0eadb30c357ca, type: 2}
   _computeShader: {fileID: 7200000, guid: 2e9e0b59fcaf74b44b1b0db786908682, type: 3}
+  simulationParams:
+    attraction: 0.003
+    jitter: 0.001
+    surfaceColor: {r: 1, g: 0, b: 0, a: 1}
+    interiorColor: {r: 0, g: 1, b: 0, a: 1}
+    exteriorColor: {r: 0, g: 0, b: 1, a: 1}
+    interiorColorDist: 5
+    exteriorColorDist: 1.5
+    colorStiffness: 4
+    speedStretch: 5
 --- !u!1 &1819453438
 GameObject:
   m_ObjectHideFlags: 0
