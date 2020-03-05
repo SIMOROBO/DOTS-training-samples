@@ -1,0 +1,39 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma enable_d3d11_debug_symbols
+
+#define Kernel_X 8
+#define Kernel_Y 8
+#define Kernel_Z 8
+
+RWStructuredBuffer<float4x4> TransformsBuffer;
+uint gInstancesCount;
+uint gInstancesPerRow;
+float gCosTime;
+
+[numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
+void CSMain (
+	uint3 groupId : SV_GroupID,
+	uint3 groupThreadId : SV_GroupThreadID,
+	uint3 dispatchThreadId : SV_DispatchThreadID,
+	uint groupIndex : SV_GroupIndex)
+{
+	uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
+	//uint threadGroupIndex = (groupId.x * (groupSize * 4)) + groupId.y * (groupSize *2)+ (groupId.z * groupSize);  // 4096
+	uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
+	uint index = threadGroupIndex + groupIndex;
+	uint3 groupOffset = uint3((groupId.x * (Kernel_X )), groupId.y * (Kernel_X * 1), (groupId.z * Kernel_X));
+
+	float spacing = 4 * gCosTime;
+
+	float3 pos = float3(dispatchThreadId.x * spacing, dispatchThreadId.y * spacing, dispatchThreadId.z * spacing);
+	float3 color = (cos(pos) + 1)*.5f;
+
+	TransformsBuffer[index] =
+		float4x4(
+			float4(1, 0, 0, pos.x),
+			float4(0, 1, 0, pos.y),
+			float4(0, 0, 1, pos.z),
+			float4(color, 1)
+			);
+}

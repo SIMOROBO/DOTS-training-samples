@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
+[ExecuteAlways]
 public class ParticleRenderer : MonoBehaviour
 {
     public Mesh _mesh;
     public Material _material;
     private ParticleDrawCall _drawcall;
+    public ComputeShader _computeShader;
 
     void Update()
     {
-        DrawParticles();
+        DrawComputeParticles();
     }
 
     private void DrawParticles()
@@ -24,6 +26,22 @@ public class ParticleRenderer : MonoBehaviour
 
         if (_drawcall != null)
         {
+            Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);            
+        }
+    }
+
+    private void DrawComputeParticles()
+    {
+        if (_drawcall == null && _mesh != null && _material != null)
+        {
+            //_drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 4096);
+            _drawcall = DrawCallGenerator.GetComputeDrawcall(_computeShader, _mesh, _material, 32768);
+
+        }
+
+        if (_drawcall != null)
+        {
+            _drawcall.Update();
             Graphics.DrawMeshInstancedIndirect(_drawcall.Mesh, _drawcall.SubMeshIndex, _drawcall.Material, _drawcall.Bounds, _drawcall.ArgsBuffer);
         }
     }
