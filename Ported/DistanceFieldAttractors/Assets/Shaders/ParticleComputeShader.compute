@@ -55,6 +55,12 @@ void CSUpdate (
     float3 color = data.color;
     float3 pos = data.position;
 
+    float scale = float3(0.1f, 0.01f, max(0.1f, length(data.velocity) * gSpeedStretch));
+    float4x4 rot = LookAtMatrix(normalize(data.velocity));
+
+    float4x4 matrix = float4x4.TRS(particleData.Position, q, scale);
+
+
     TransformsBuffer[index] =
         float4x4(
             float4(1, 0, 0, pos.x),

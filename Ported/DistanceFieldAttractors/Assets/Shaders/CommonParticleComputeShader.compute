@@ -114,4 +114,20 @@ FixedUpdateData ComputeParticleData(int index, float3 normal, float dist)
     return data;
 }
 
+float4x4 LookAtMatrix(float3 target)
+{
+    float3 eye = 0;
+    float3 up = float3(0, 1, 0);
+    float3 zaxis = normalize(target - eye);
+    float3 xaxis = normalize(cross(up, zaxis));
+    float3 yaxis = cross(zaxis, xaxis);
+
+    return float4x4(
+            float4(xaxis.x, yaxis.x, zaxis.x, 0),
+            float4(xaxis.y, yaxis.y, zaxis.y, 0),
+            float4(xaxis.z, yaxis.z, zaxis.z, 0),
+            float4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)
+        );
+}
+
 #endif
