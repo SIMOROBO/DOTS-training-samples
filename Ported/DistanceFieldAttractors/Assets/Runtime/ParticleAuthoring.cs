@@ -9,6 +9,10 @@ public class ParticleAuthoring : MonoBehaviour, IConvertGameObjectToEntity
 {
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
+        dstManager.AddComponent<ParticleData>(entity);
+        dstManager.AddComponent<MaterialData>(entity);
+        dstManager.AddComponent<ParticleTransform>(entity);
+
         // Remove components that we don't need
         if (dstManager.HasComponent<Translation>(entity))
             dstManager.RemoveComponent<Translation>(entity);
