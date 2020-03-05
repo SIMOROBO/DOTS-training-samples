@@ -22,12 +22,20 @@ public class ParticleDrawCall
                 PositionBuffer = new ComputeBuffer((int)Count, 16 * 4);
             }
 
+            if (FixedUpdateBuffer == null)
+            {
+                // FixedUpdateData is made of three float3.
+                int stride = 3 * sizeof(float) * 3;
+
+                FixedUpdateBuffer = new ComputeBuffer((int)Count, stride);
+            }
+
             int kernelIndex = ComputeShader.FindKernel("CSInitialize");
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
-
-                //ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
+                
+                ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
                 ComputeShader.SetBuffer(kernelIndex, "TransformsBuffer", PositionBuffer);
                 ComputeShader.SetInt("gInstancesCount", (int)Count);
                 ComputeShader.SetInt("gInstancesPerRow", (int)instancesPerRow);
@@ -67,14 +75,6 @@ public class ParticleDrawCall
     {
         if (IsInitialized && ComputeShader != null)
         {
-            if (FixedUpdateBuffer == null)
-            {
-                // FixedUpdateData is made of three float3.
-                int stride = 3 * sizeof(float) * 3;
-
-                FixedUpdateBuffer = new ComputeBuffer((int)Count, stride);
-            }
-
             int kernelIndex = ComputeShader.FindKernel("CSFixedUpdate");
             if (kernelIndex != -1)
             {
