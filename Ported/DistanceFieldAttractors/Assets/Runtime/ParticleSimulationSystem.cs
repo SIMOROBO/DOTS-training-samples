@@ -25,9 +25,9 @@ public class ParticleSimulationSystem : JobComponentSystem
     }
 
     [BurstCompile]
-    static float Sphere(float x, float y, float z, float radius)
+    static float Sphere(float3 position, float radius)
     {
-        return math.sqrt(x * x + y * y + z * z) - radius;
+        return math.length(position) - radius;
     }
 
     [BurstCompile]
@@ -39,26 +39,24 @@ public class ParticleSimulationSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, ref ParticleData particleData)
         {
-            var x = particleData.Position.x;
-            var y = particleData.Position.y;
-            var z = particleData.Position.z;
+            var position = particleData.Position;
             var distance = float.MaxValue;
             var normal = float3.zero;
 
             for (var i = 0; i < 5; i++)
             {
                 var orbitRadius = i * 0.5f + 2f;
-                var angle1 = Time * 4f * (1f + i * 0.1f);
-                var angle2 = Time * 4f * (1.2f + i * 0.117f);
-                var angle3 = Time * 4f * (1.3f + i * 0.1618f);
-                var cx = math.cos(angle1) * orbitRadius;
-                var cy = math.sin(angle2) * orbitRadius;
-                var cz = math.sin(angle3) * orbitRadius;
+                var time = Time * 4f;
+                var angle1 = time * (1f + i * 0.1f);
+                var angle2 = time * (1.2f + i * 0.117f);
+                var angle3 = time * (1.3f + i * 0.1618f);
+                var c = new float3(math.cos(angle1), math.sin(angle2), math.sin(angle3)) * orbitRadius;
 
-                var newDist = SmoothMin(distance, Sphere(x - cx, y - cy, z - cz, 2f), 2f);
+                var diff = position - c;
+                var newDist = SmoothMin(distance, Sphere(diff, 2f), 2f);
                 if (newDist < distance)
                 {
-                    normal = new float3(x - cx, y - cy, z - cz);
+                    normal = diff;
                     distance = newDist;
                 }
             }
@@ -77,9 +75,7 @@ public class ParticleSimulationSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, ref ParticleData particleData)
         {
-            var x = particleData.Position.x;
-            var y = particleData.Position.y;
-            var z = particleData.Position.z;
+            var position = particleData.Position;
             var distance = float.MaxValue;
             var normal = float3.zero;
 
@@ -88,15 +84,14 @@ public class ParticleSimulationSystem : JobComponentSystem
                 var orbitRadius = (i / 2 + 2) * 2;
                 var anglea = Time * 20f * (1f + i * 0.1f);
                 var sinAngle = math.sin(anglea);
-                var cx = math.cos(anglea) * orbitRadius;
-                var cy = sinAngle;
-                var cz = sinAngle * orbitRadius;
+                var c = new float3(math.cos(anglea) * orbitRadius, sinAngle, sinAngle * orbitRadius);
 
-                var newDist = Sphere(x - cx, y - cy, z - cz, 2f);
+                var diff = position - c;
+                var newDist = Sphere(diff, 2f);
 
                 if (newDist < distance)
                 {
-                    normal = new float3(x - cx, y - cy, z - cz);
+                    normal = diff;
                     distance = newDist;
                 }
             }
@@ -115,14 +110,12 @@ public class ParticleSimulationSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, ref ParticleData particleData)
         {
-            var x = particleData.Position.x;
-            var y = particleData.Position.y;
-            var z = particleData.Position.z;
+            var position = particleData.Position;
 
-            var sphereDist = Sphere(x, y, z, 5f);
-            var sphereNormal = math.normalize(new float3(x, y, z));
+            var sphereDist = Sphere(position, 5f);
+            var sphereNormal = math.normalize(position);
 
-            var planeDist = y;
+            var planeDist = position.y;
             var planeNormal = new float3(0f, 1f, 0f);
 
             var t = math.sin(Time * 8f) * 0.4f + 0.4f;
@@ -143,22 +136,15 @@ public class ParticleSimulationSystem : JobComponentSystem
 
         public void Execute(Entity entity, int index, ref ParticleData particleData)
         {
-            var x = particleData.Position.x;
-            var y = particleData.Position.y;
-            var z = particleData.Position.z;
+            var position = particleData.Position;
 
             float spacing = 5f + math.sin(Time * 5f) * 2f;
-            x += spacing * 0.5f;
-            y += spacing * 0.5f;
-            z += spacing * 0.5f;
-            x -= math.floor(x / spacing) * spacing;
-            y -= math.floor(y / spacing) * spacing;
-            z -= math.floor(z / spacing) * spacing;
-            x -= spacing * 0.5f;
-            y -= spacing * 0.5f;
-            z -= spacing * 0.5f;
-            var distance = Sphere(x, y, z, 5f);
-            var normal = new float3(x, y, z);
+            var spacingVector = new float3(1f, 1f, 1f) * spacing * 0.5f;
+            position += spacingVector;
+            position -= math.floor(position / spacing) * spacing;
+            position -= spacingVector;
+            var distance = Sphere(position, 5f);
+            var normal = position;
 
             Distances[index] = distance;
             Normals[index] = normal;
@@ -191,7 +177,7 @@ public class ParticleSimulationSystem : JobComponentSystem
             var normal = new float3(x - point.x, y - point.y, (z - point.z) * flipper);
             var wave = math.cos(angle * flipper * 3f) * 0.5f + 0.5f;
             wave *= wave * 0.5f;
-            var distance = math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z) - (0.5f + wave);
+            var distance = math.length(normal) - (0.5f + wave);
 
             Distances[index] = distance;
             Normals[index] = normal;
