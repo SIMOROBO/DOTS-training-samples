@@ -98,5 +98,9 @@ public class ParticleDrawCall
         if (ArgsBuffer != null)
             ArgsBuffer.Release();
         ArgsBuffer = null;
+
+        if(FixedUpdateBuffer != null)
+            FixedUpdateBuffer.Release();
+        FixedUpdateBuffer = null;
     }
 }
