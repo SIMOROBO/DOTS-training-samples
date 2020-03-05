@@ -4,11 +4,10 @@
 #endif
 
 
-FixedUpdateData RunSim0(int index)
+SimOutput RunSim0(int index)
 {
-  FixedUpdateData data = FixedUpdateBuffer[index];
-  data.position *= 1.02;
-  data.color = frac(data.color+0.017);
-  data.velocity = float3(0,0,0);
-  return data;
+  SimOutput simOutput;
+  simOutput.normal = float3(0,1,0);
+  simOutput.dist = 1;
+  return simOutput;
 }

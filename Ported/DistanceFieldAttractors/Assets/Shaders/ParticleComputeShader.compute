@@ -16,7 +16,14 @@ void CSFixedUpdate0 (	uint3 groupId : SV_GroupID,
 	uint groupIndex : SV_GroupIndex)
 	{
 		uint index = GetParticleIndex(groupId, groupIndex);
-		FixedUpdateBuffer[index] = RunSim0(index);
+
+        SimOutput simOutput = RunSim0(index);
+
+        FixedUpdateData data = FixedUpdateBuffer[index];
+        data.position *= 1.02;
+        data.color = frac(data.color+0.017);
+        data.velocity = float3(0,0,0);
+        FixedUpdateBuffer[index] = data;
 	}
 
 [numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
