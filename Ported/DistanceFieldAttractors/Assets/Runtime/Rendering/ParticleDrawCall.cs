@@ -13,6 +13,7 @@ public class ParticleDrawCall
     public uint Count { get; set; }
     public ParticleRenderer.SimulationParams SimulationParams { get; set; }
     public bool IsInitialized { get; set; }
+    int k_kernelSize = 4;
 
     public void Initialize()
     {
@@ -35,13 +36,15 @@ public class ParticleDrawCall
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
-                
+                int chunksPerRow = System.Convert.ToInt32(instancesPerRow / k_kernelSize);
+
                 ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
                 ComputeShader.SetBuffer(kernelIndex, "TransformsBuffer", PositionBuffer);
+                ComputeShader.SetInt("gChunksPerRow", chunksPerRow);
                 ComputeShader.SetInt("gInstancesCount", (int)Count);
                 ComputeShader.SetInt("gInstancesPerRow", (int)instancesPerRow);
                 ComputeShader.SetFloat("gTime", Time.realtimeSinceStartup * 0.3f);
-                ComputeShader.Dispatch(kernelIndex, instancesPerRow / 8, instancesPerRow / 8, instancesPerRow / 8);
+                ComputeShader.Dispatch(kernelIndex, chunksPerRow, chunksPerRow, chunksPerRow);
                 IsInitialized = true;
             }
         }
@@ -60,13 +63,15 @@ public class ParticleDrawCall
             if (kernelIndex != -1 && FixedUpdateBuffer != null)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
+                int chunksPerRow = System.Convert.ToInt32(instancesPerRow / k_kernelSize);
 
                 ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
                 ComputeShader.SetBuffer(kernelIndex, "TransformsBuffer", PositionBuffer);
+                ComputeShader.SetInt("gChunksPerRow", chunksPerRow);
                 ComputeShader.SetInt("gInstancesCount", (int)Count);
                 ComputeShader.SetInt("gInstancesPerRow", (int)instancesPerRow);
                 ComputeShader.SetFloat("gTime", Time.realtimeSinceStartup * 0.3f);
-                ComputeShader.Dispatch(kernelIndex, instancesPerRow / 8, instancesPerRow / 8, instancesPerRow / 8);
+                ComputeShader.Dispatch(kernelIndex, chunksPerRow, chunksPerRow, chunksPerRow);
                 Material.SetBuffer("transformBuffer", PositionBuffer);
             }
         }
@@ -80,8 +85,10 @@ public class ParticleDrawCall
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
+                int chunksPerRow = System.Convert.ToInt32(instancesPerRow / k_kernelSize);
 
                 ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
+                ComputeShader.SetInt("gChunksPerRow", chunksPerRow);
                 ComputeShader.SetInt("gInstancesCount", (int)Count);
                 ComputeShader.SetInt("gInstancesPerRow", (int)instancesPerRow);
                 ComputeShader.SetFloat("gTime", Time.realtimeSinceStartup * 0.3f);
@@ -94,7 +101,7 @@ public class ParticleDrawCall
                 ComputeShader.SetVector("gSurfaceColor", new Vector4(SimulationParams.surfaceColor.r, SimulationParams.surfaceColor.g, SimulationParams.surfaceColor.b, 1.0f));
                 ComputeShader.SetVector("gInteriorColor", new Vector4(SimulationParams.interiorColor.r, SimulationParams.interiorColor.g, SimulationParams.interiorColor.b, 1.0f));
                 ComputeShader.SetVector("gExteriorColor", new Vector4(SimulationParams.exteriorColor.r, SimulationParams.exteriorColor.g, SimulationParams.exteriorColor.b, 1.0f));
-                ComputeShader.Dispatch(kernelIndex, instancesPerRow / 8, instancesPerRow / 8, instancesPerRow / 8);
+                ComputeShader.Dispatch(kernelIndex, chunksPerRow, chunksPerRow, chunksPerRow);
             }
         }
     }

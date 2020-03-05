@@ -3,10 +3,12 @@
 #pragma kernel CSUpdate
 #pragma enable_d3d11_debug_symbols
 
+
+
 #include "CommonParticleComputeShader.compute"
 #include "ParticleSimulation_0.compute"
 
-[numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
 void CSInitialize (
     uint3 groupId : SV_GroupID,
     uint3 groupThreadId : SV_GroupThreadID,
@@ -32,7 +34,7 @@ void CSInitialize (
     FixedUpdateBuffer[index] = data;
 }
 
-[numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
 void CSFixedUpdate0 (
     uint3 groupId : SV_GroupID,
     uint3 groupThreadId : SV_GroupThreadID,
@@ -44,7 +46,7 @@ void CSFixedUpdate0 (
     FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
 }
 
-[numthreads(Kernel_X, Kernel_Y, Kernel_Z)]
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
 void CSUpdate (
     uint3 groupId : SV_GroupID,
     uint3 groupThreadId : SV_GroupThreadID,
@@ -58,8 +60,7 @@ void CSUpdate (
     float scale = float3(0.1f, 0.01f, max(0.1f, length(data.velocity) * gSpeedStretch));
     float4x4 rot = LookAtMatrix(normalize(data.velocity));
 
-    float4x4 matrix = float4x4.TRS(particleData.Position, q, scale);
-
+    //float4x4 m = float4x4.TRS(particleData.Position, q, scale);
 
     TransformsBuffer[index] =
         float4x4(

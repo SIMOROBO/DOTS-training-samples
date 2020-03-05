@@ -1,9 +1,7 @@
 #ifndef COMMONPARTICLECOMPUTESHADER_INCLUDED
 #define COMMONPARTICLECOMPUTESHADER_INCLUDED
 
-#define Kernel_X 8
-#define Kernel_Y 8
-#define Kernel_Z 8
+#define KERNEL_SIZE 4
 
 #define GOLDENRATIO 0.618033988749895
 #define PI 3.1415926535897932384626433
@@ -27,6 +25,7 @@ RWStructuredBuffer<FixedUpdateData> FixedUpdateBuffer;
 uint gInstancesCount;
 uint gInstancesPerRow;
 float gTime;
+uint gChunksPerRow;
 
 float gAttraction;
 float gJitter;
@@ -40,9 +39,11 @@ float4 gExteriorColor;
 
 uint GetParticleIndex(uint3 groupId, uint groupIndex)
 {
-    uint groupSize = Kernel_X * Kernel_Y * Kernel_Z;
-    //uint threadGroupIndex = (groupId.x * (groupSize * 4)) + groupId.y * (groupSize *2)+ (groupId.z * groupSize);  // 4096
-    uint threadGroupIndex = (groupId.x * (groupSize * 16)) + groupId.y * (groupSize * 4) + (groupId.z * groupSize); // 32768
+    uint chunkSize = KERNEL_SIZE * KERNEL_SIZE * KERNEL_SIZE;
+    uint gridSliceSize = chunkSize * gChunksPerRow * gChunksPerRow;
+    uint gridLineSize = chunkSize * gChunksPerRow;
+
+    uint threadGroupIndex = (groupId.x * gridSliceSize) + groupId.y * gridLineSize + (groupId.z * chunkSize);
     uint index = threadGroupIndex + groupIndex;
     return index;
 }
