@@ -16,142 +16,208 @@ public class ParticleSimulationSystem : JobComponentSystem
 {
     private EntityQuery m_ParticleQuery;
 
+    // Smooth-Minimum, from Media Molecule's "Dreams"
     [BurstCompile]
-    struct GetDistanceJob : IJobForEachWithEntity<ParticleData>
+    static float SmoothMin(float a, float b, float radius)
     {
-        public DistanceFieldModels Model;
+        var e = math.max(radius - math.abs(a - b), 0f);
+        return math.min(a, b) - e * e * 0.25f / radius;
+    }
+
+    [BurstCompile]
+    static float Sphere(float x, float y, float z, float radius)
+    {
+        return math.sqrt(x * x + y * y + z * z) - radius;
+    }
+
+    [BurstCompile]
+    struct GetDistanceMetaballsJob : IJobForEachWithEntity<ParticleData>
+    {
         public float Time;
         public NativeArray<float> Distances;
         public NativeArray<float3> Normals;
 
-        // Smooth-Minimum, from Media Molecule's "Dreams"
-        float SmoothMin(float a, float b, float radius)
-        {
-            float e = math.max(radius - Mathf.Abs(a - b), 0);
-            return math.min(a, b) - e * e * 0.25f / radius;
-        }
-
-        float Sphere(float x, float y, float z, float radius)
-        {
-            return math.sqrt(x * x + y * y + z * z) - radius;
-        }
-
         public void Execute(Entity entity, int index, ref ParticleData particleData)
         {
-
             var x = particleData.Position.x;
             var y = particleData.Position.y;
             var z = particleData.Position.z;
             var distance = float.MaxValue;
             var normal = float3.zero;
 
-            switch (Model)
+            for (var i = 0; i < 5; i++)
             {
-                case DistanceFieldModels.Metaballs:
+                var orbitRadius = i * 0.5f + 2f;
+                var angle1 = Time * 4f * (1f + i * 0.1f);
+                var angle2 = Time * 4f * (1.2f + i * 0.117f);
+                var angle3 = Time * 4f * (1.3f + i * 0.1618f);
+                var cx = math.cos(angle1) * orbitRadius;
+                var cy = math.sin(angle2) * orbitRadius;
+                var cz = math.sin(angle3) * orbitRadius;
 
-                    for (int i = 0; i < 5; i++)
-                    {
-                        float orbitRadius = i * 0.5f + 2f;
-                        float angle1 = Time * 4f * (1f + i * 0.1f);
-                        float angle2 = Time * 4f * (1.2f + i * 0.117f);
-                        float angle3 = Time * 4f * (1.3f + i * 0.1618f);
-                        float cx = math.cos(angle1) * orbitRadius;
-                        float cy = math.sin(angle2) * orbitRadius;
-                        float cz = math.sin(angle3) * orbitRadius;
-
-                        float newDist = SmoothMin(distance, Sphere(x - cx, y - cy, z - cz, 2f), 2f);
-                        if (newDist < distance)
-                        {
-                            normal = new float3(x - cx, y - cy, z - cz);
-                            distance = newDist;
-                        }
-                    }
-
-                    break;
-
-                case DistanceFieldModels.SpinMixer:
-                    for (int i = 0; i < 6; i++)
-                    {
-                        float orbitRadius = (i / 2 + 2) * 2;
-                        float anglea = Time * 20f * (1f + i * 0.1f);
-                        float cx = math.cos(anglea) * orbitRadius;
-                        float cy = math.sin(anglea);
-                        float cz = math.sin(anglea) * orbitRadius;
-
-                        float newDist = Sphere(x - cx, y - cy, z - cz, 2f);
-
-                        if (newDist < distance)
-                        {
-                            normal = new float3(x - cx, y - cy, z - cz);
-                            distance = newDist;
-                        }
-                    }
-
-                    break;
-
-                case DistanceFieldModels.SpherePlane:
-
-                    float sphereDist = Sphere(x, y, z, 5f);
-                    float3 sphereNormal = math.normalize(new float3(x, y, z));
-
-                    float planeDist = y;
-                    float3 planeNormal = new float3(0f, 1f, 0f);
-
-                    float t = math.sin(Time * 8f) * 0.4f + 0.4f;
-                    distance = math.lerp(sphereDist, planeDist, t);
-                    normal = math.lerp(sphereNormal, planeNormal, t);
-
-                    break;
-
-                case DistanceFieldModels.SphereField:
-
-                    float spacing = 5f + math.sin(Time * 5f) * 2f;
-                    x += spacing * 0.5f;
-                    y += spacing * 0.5f;
-                    z += spacing * 0.5f;
-                    x -= math.floor(x / spacing) * spacing;
-                    y -= math.floor(y / spacing) * spacing;
-                    z -= math.floor(z / spacing) * spacing;
-                    x -= spacing * 0.5f;
-                    y -= spacing * 0.5f;
-                    z -= spacing * 0.5f;
-                    distance = Sphere(x, y, z, 5f);
-                    normal = new float3(x, y, z);
-
-                    break;
-
-                case DistanceFieldModels.FigureEight:
-
-                    float ringRadius = 4f;
-                    float flipper = 1f;
-                    if (z < 0f)
-                    {
-                        z = -z;
-                        flipper = -1f;
-                    }
-                    float3 point = math.normalize(new float3(x, 0f, z - ringRadius)) * ringRadius;
-                    float angle = math.atan2(point.z, point.x) + Time * 8f;
-                    point += new float3(0f, 0f, 1f) * ringRadius;
-                    normal = new float3(x - point.x, y - point.y, (z - point.z) * flipper);
-                    float wave = math.cos(angle * flipper * 3f) * 0.5f + 0.5f;
-                    wave *= wave * 0.5f;
-                    distance = math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z) - (0.5f + wave);
-
-                    break;
-
-                case DistanceFieldModels.PerlinNoise:
-
-                    float perlin = noise.cnoise(new float2(x * 0.2f, z * 0.2f));
-                    distance = y - perlin * 6f;
-                    normal = math.up();
-
-                    break;
+                var newDist = SmoothMin(distance, Sphere(x - cx, y - cy, z - cz, 2f), 2f);
+                if (newDist < distance)
+                {
+                    normal = new float3(x - cx, y - cy, z - cz);
+                    distance = newDist;
+                }
             }
 
             Distances[index] = distance;
             Normals[index] = normal;
         }
     }
+
+    [BurstCompile]
+    struct GetDistanceSpinMixerJob : IJobForEachWithEntity<ParticleData>
+    {
+        public float Time;
+        public NativeArray<float> Distances;
+        public NativeArray<float3> Normals;
+
+        public void Execute(Entity entity, int index, ref ParticleData particleData)
+        {
+            var x = particleData.Position.x;
+            var y = particleData.Position.y;
+            var z = particleData.Position.z;
+            var distance = float.MaxValue;
+            var normal = float3.zero;
+
+            for (var i = 0; i < 6; i++)
+            {
+                var orbitRadius = (i / 2 + 2) * 2;
+                var anglea = Time * 20f * (1f + i * 0.1f);
+                var cx = math.cos(anglea) * orbitRadius;
+                var cy = math.sin(anglea);
+                var cz = math.sin(anglea) * orbitRadius;
+
+                var newDist = Sphere(x - cx, y - cy, z - cz, 2f);
+
+                if (newDist < distance)
+                {
+                    normal = new float3(x - cx, y - cy, z - cz);
+                    distance = newDist;
+                }
+            }
+
+            Distances[index] = distance;
+            Normals[index] = normal;
+        }
+    }
+
+    [BurstCompile]
+    struct GetDistanceSpherePlaneJob : IJobForEachWithEntity<ParticleData>
+    {
+        public float Time;
+        public NativeArray<float> Distances;
+        public NativeArray<float3> Normals;
+
+        public void Execute(Entity entity, int index, ref ParticleData particleData)
+        {
+            var x = particleData.Position.x;
+            var y = particleData.Position.y;
+            var z = particleData.Position.z;
+
+            var sphereDist = Sphere(x, y, z, 5f);
+            var sphereNormal = math.normalize(new float3(x, y, z));
+
+            var planeDist = y;
+            var planeNormal = new float3(0f, 1f, 0f);
+
+            var t = math.sin(Time * 8f) * 0.4f + 0.4f;
+            var distance = math.lerp(sphereDist, planeDist, t);
+            var normal = math.lerp(sphereNormal, planeNormal, t);
+
+            Distances[index] = distance;
+            Normals[index] = normal;
+        }
+    }
+
+    [BurstCompile]
+    struct GetDistanceSphereFieldJob : IJobForEachWithEntity<ParticleData>
+    {
+        public float Time;
+        public NativeArray<float> Distances;
+        public NativeArray<float3> Normals;
+
+        public void Execute(Entity entity, int index, ref ParticleData particleData)
+        {
+            var x = particleData.Position.x;
+            var y = particleData.Position.y;
+            var z = particleData.Position.z;
+
+            float spacing = 5f + math.sin(Time * 5f) * 2f;
+            x += spacing * 0.5f;
+            y += spacing * 0.5f;
+            z += spacing * 0.5f;
+            x -= math.floor(x / spacing) * spacing;
+            y -= math.floor(y / spacing) * spacing;
+            z -= math.floor(z / spacing) * spacing;
+            x -= spacing * 0.5f;
+            y -= spacing * 0.5f;
+            z -= spacing * 0.5f;
+            var distance = Sphere(x, y, z, 5f);
+            var normal = new float3(x, y, z);
+
+            Distances[index] = distance;
+            Normals[index] = normal;
+        }
+    }
+
+    [BurstCompile]
+    struct GetDistanceFigureEightJob : IJobForEachWithEntity<ParticleData>
+    {
+        public float Time;
+        public NativeArray<float> Distances;
+        public NativeArray<float3> Normals;
+
+        public void Execute(Entity entity, int index, ref ParticleData particleData)
+        {
+            var x = particleData.Position.x;
+            var y = particleData.Position.y;
+            var z = particleData.Position.z;
+
+            var ringRadius = 4f;
+            var flipper = 1f;
+            if (z < 0f)
+            {
+                z = -z;
+                flipper = -1f;
+            }
+            var point = math.normalize(new float3(x, 0f, z - ringRadius)) * ringRadius;
+            var angle = math.atan2(point.z, point.x) + Time * 8f;
+            point += new float3(0f, 0f, 1f) * ringRadius;
+            var normal = new float3(x - point.x, y - point.y, (z - point.z) * flipper);
+            var wave = math.cos(angle * flipper * 3f) * 0.5f + 0.5f;
+            wave *= wave * 0.5f;
+            var distance = math.sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z) - (0.5f + wave);
+
+            Distances[index] = distance;
+            Normals[index] = normal;
+        }
+    }
+
+    [BurstCompile]
+    struct GetDistancePerlinNoiseJob : IJobForEachWithEntity<ParticleData>
+    {
+        public NativeArray<float> Distances;
+        public NativeArray<float3> Normals;
+
+        public void Execute(Entity entity, int index, ref ParticleData particleData)
+        {
+            var x = particleData.Position.x;
+            var y = particleData.Position.y;
+            var z = particleData.Position.z;
+
+            var  perlin = noise.cnoise(new float2(x * 0.2f, z * 0.2f));
+            var distance = y - perlin * 6f;
+            var normal = math.up();
+
+            Distances[index] = distance;
+            Normals[index] = normal;
+        }
+    }
+
 
     [BurstCompile]
     struct ParticlePositionSimulationJob : IJobForEachWithEntity<ParticleData>
@@ -182,7 +248,7 @@ public class ParticleSimulationSystem : JobComponentSystem
     }
 
     [BurstCompile]
-    struct ParticleMaterialSimulatoinJob : IJobForEachWithEntity<MaterialData>
+    struct ParticleMaterialSimulationJob : IJobForEachWithEntity<MaterialData>
     {
         public float DeltaTime;
         public float3 InteriorColor;
@@ -220,15 +286,66 @@ public class ParticleSimulationSystem : JobComponentSystem
         var distances = new NativeArray<float>(count, Allocator.TempJob);
         var normals = new NativeArray<float3>(count, Allocator.TempJob);
 
-        var getDistanceJob = new GetDistanceJob
+        // Get Distance
+        var getDistanceHandle = inputDeps;
+        switch (distanceFieldData.Model)
         {
-            Model = distanceFieldData.Model,
-            Time = (float)distanceFieldData.ElapsedTime,
-            Distances = distances,
-            Normals = normals,
-        };
-        var getDistanceHandle = getDistanceJob.Schedule(this, inputDeps);
+            case DistanceFieldModels.Metaballs:
+                var getDistanceMetaballsJob = new GetDistanceMetaballsJob
+                {
+                    Time = (float)distanceFieldData.ElapsedTime,
+                    Distances = distances,
+                    Normals = normals,
+                };
+                getDistanceHandle = getDistanceMetaballsJob.Schedule(this, inputDeps);
+                break;
+            case DistanceFieldModels.SpinMixer:
+                var getDistanceSpinMixerJob = new GetDistanceSpinMixerJob
+                {
+                    Time = (float)distanceFieldData.ElapsedTime,
+                    Distances = distances,
+                    Normals = normals,
+                };
+                getDistanceHandle = getDistanceSpinMixerJob.Schedule(this, inputDeps);
+                break;
+            case DistanceFieldModels.SpherePlane:
+                var getDistanceSpherePlaneJob = new GetDistanceSpherePlaneJob
+                {
+                    Time = (float)distanceFieldData.ElapsedTime,
+                    Distances = distances,
+                    Normals = normals,
+                };
+                getDistanceHandle = getDistanceSpherePlaneJob.Schedule(this, inputDeps);
+                break;
+            case DistanceFieldModels.SphereField:
+                var getDistanceSphereFieldJob = new GetDistanceSphereFieldJob
+                {
+                    Time = (float)distanceFieldData.ElapsedTime,
+                    Distances = distances,
+                    Normals = normals,
+                };
+                getDistanceHandle = getDistanceSphereFieldJob.Schedule(this, inputDeps);
+                break;
+            case DistanceFieldModels.FigureEight:
+                var getDistanceFigureEightJob = new GetDistanceFigureEightJob
+                {
+                    Time = (float)distanceFieldData.ElapsedTime,
+                    Distances = distances,
+                    Normals = normals,
+                };
+                getDistanceHandle = getDistanceFigureEightJob.Schedule(this, inputDeps);
+                break;
+            case DistanceFieldModels.PerlinNoise:
+                var getDistancePerlineNoiseJob = new GetDistancePerlinNoiseJob
+                {
+                    Distances = distances,
+                    Normals = normals,
+                };
+                getDistanceHandle = getDistancePerlineNoiseJob.Schedule(this, inputDeps);
+                break;
+        }
 
+        // Position
         var particlePositionSimulationJob = new ParticlePositionSimulationJob
         {
             Rnd = new Random(123),
@@ -239,7 +356,8 @@ public class ParticleSimulationSystem : JobComponentSystem
         };
         var particlePositionHandle = particlePositionSimulationJob.Schedule(this, getDistanceHandle);
 
-        var particleMaterialSimulationJob = new ParticleMaterialSimulatoinJob
+        // Material
+        var particleMaterialSimulationJob = new ParticleMaterialSimulationJob
         {
             DeltaTime = Time.DeltaTime,
             InteriorColor = particleManagerData.InteriorColor,
