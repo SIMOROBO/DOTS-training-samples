@@ -62,8 +62,8 @@ MonoBehaviour:
   attraction: 0.003
   speedStretch: 5
   jitter: 0.001
-  particleMesh: {fileID: 0}
-  particleMaterial: {fileID: 0}
+  particleMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  particleMaterial: {fileID: 2100000, guid: 1e5d6d6076e23f04e9d0eadb30c357ca, type: 2}
   surfaceColor: {r: 0.31989613, g: 0.24178201, b: 0.63235295, a: 1}
   interiorColor: {r: 0.9044118, g: 0.458856, b: 0.458856, a: 1}
   exteriorColor: {r: 0.5230861, g: 0.84290206, b: 0.9485294, a: 1}
