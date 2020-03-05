@@ -1,6 +1,7 @@
 ﻿using System;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 [Serializable]
@@ -80,6 +81,13 @@ public class ParticleManagerDataAuthoring : MonoBehaviour, IConvertGameObjectToE
             ParticleMesh = particleMesh,
             ParticleMaterial = particleMaterial,
         });
-        
+
+        // Remove components that we don't need
+        if (dstManager.HasComponent<Translation>(entity))
+            dstManager.RemoveComponent<Translation>(entity);
+        if (dstManager.HasComponent<Rotation>(entity))
+            dstManager.RemoveComponent<Rotation>(entity);
+        if (dstManager.HasComponent<LocalToWorld>(entity))
+            dstManager.RemoveComponent<LocalToWorld>(entity);
     }
 }

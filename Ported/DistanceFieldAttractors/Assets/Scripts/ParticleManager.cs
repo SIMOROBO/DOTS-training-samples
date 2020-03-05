@@ -2,6 +2,7 @@
 
 public class ParticleManager : MonoBehaviour
 {
+    public int numberOfParticles = 4000;
     public float attraction;
     public float speedStretch;
     public float jitter;
@@ -25,7 +26,7 @@ public class ParticleManager : MonoBehaviour
     void Start()
     {
         finalBatchCount = 0;
-        orbiters = new Orbiter[4000];
+        orbiters = new Orbiter[numberOfParticles];
         matrices = new Matrix4x4[orbiters.Length / instancesPerBatch + 1][];
         matrices[0] = new Matrix4x4[instancesPerBatch];
         colors = new Vector4[matrices.Length][];
