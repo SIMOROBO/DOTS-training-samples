@@ -112,7 +112,7 @@ void CSUpdate (
 
     float3 velocityNormalized = normalize(velocity);
     float velocityLength = dot(velocity, velocityNormalized);
-    float3 scale = float3(0.01f, 0.1f, max(0.1f, velocityLength * gSpeedStretch));
+    float3 scale = float3(0.1f, 0.01f, max(0.1f, velocityLength * gSpeedStretch));
 
     TransformsBuffer[index] = LookAtTRSC(position, velocityNormalized, scale, color);
 }
