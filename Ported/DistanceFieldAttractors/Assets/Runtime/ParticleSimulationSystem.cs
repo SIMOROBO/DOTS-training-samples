@@ -43,10 +43,10 @@ public class ParticleSimulationSystem : JobComponentSystem
             var distance = float.MaxValue;
             var normal = float3.zero;
 
+            var time = Time * 4f;
             for (var i = 0; i < 5; i++)
             {
                 var orbitRadius = i * 0.5f + 2f;
-                var time = Time * 4f;
                 var angle1 = time * (1f + i * 0.1f);
                 var angle2 = time * (1.2f + i * 0.117f);
                 var angle3 = time * (1.3f + i * 0.1618f);
