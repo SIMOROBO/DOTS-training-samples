@@ -240,7 +240,7 @@ MonoBehaviour:
   simulationParams:
     numberOfParticles: 4000
     attraction: 0.003
-    jitter: 0.001
+    jitter: 0.005
     surfaceColor: {r: 0.31989613, g: 0.24178201, b: 0.63235295, a: 1}
     interiorColor: {r: 0.9044118, g: 0.458856, b: 0.458856, a: 1}
     exteriorColor: {r: 0.5230861, g: 0.84290206, b: 0.9485294, a: 1}
