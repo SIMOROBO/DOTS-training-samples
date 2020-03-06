@@ -26,13 +26,14 @@ public class ParticleTransformSystem : JobComponentSystem
 
             handleDeps = Entities.ForEach((Entity entity, ref ParticleTransform particleTransform, in ParticleData particleData, in MaterialData materialData) =>
             {
-                var scale = new float3(0.1f, 0.01f, math.max(0.1f, math.length(particleData.Velocity) * particleManagerData.SpeedStretch));
+                var scaleZ = math.max(0.1f, math.length(particleData.Velocity) * particleManagerData.SpeedStretch);
                 var q = quaternion.LookRotation(math.normalize(particleData.Velocity), upVector);
 
-                float4x4 matrix = float4x4.TRS(particleData.Position, q, scale);
+                float4x4 matrix = float4x4.TRS(particleData.Position, q, 1.0f);
                 matrix.c0.w = materialData.Color.x;
                 matrix.c1.w = materialData.Color.y;
                 matrix.c2.w = materialData.Color.z;
+                matrix.c3.w = scaleZ;
                 particleTransform.transform = matrix;
 
             }).Schedule(inputDeps);
