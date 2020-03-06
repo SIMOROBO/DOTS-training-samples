@@ -27,8 +27,3 @@ SimOutput SimulationMetaballs(float3 pos)
 
     return simOutput;
 }
-
-SimOutput RunSim0(int index)
-{
-    return SimulationMetaballs(FixedUpdateBuffer[index].position);
-}

@@ -1,12 +1,16 @@
 #pragma kernel CSInitialize
 #pragma kernel CSFixedUpdate0
+#pragma kernel CSFixedUpdate1
+#pragma kernel CSFixedUpdate2
+#pragma kernel CSFixedUpdate3
+#pragma kernel CSFixedUpdate4
+#pragma kernel CSFixedUpdate5
 #pragma kernel CSUpdate
-#pragma enable_d3d11_debug_symbols
-
-
+//#pragma enable_d3d11_debug_symbols
 
 #include "CommonParticleComputeShader.compute"
-#include "ParticleSimulation_0.compute"
+#include "SimulationMetaballs.compute"
+#include "SimulationSpinMixer.compute"
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
 void CSInitialize (
@@ -41,9 +45,57 @@ void CSFixedUpdate0 (
     uint groupIndex : SV_GroupIndex)
 {
     uint index = GetParticleIndex(groupId, groupIndex);
-
-    SimOutput simOutput = RunSim0(index);
+    float3 pos = FixedUpdateBuffer[index].position;
+    SimOutput simOutput = SimulationMetaballs(pos);
     FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
+}
+
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
+void CSFixedUpdate1(
+    uint3 groupId : SV_GroupID,
+    uint3 groupThreadId : SV_GroupThreadID,
+    uint groupIndex : SV_GroupIndex)
+{
+    uint index = GetParticleIndex(groupId, groupIndex);
+    float3 pos = FixedUpdateBuffer[index].position;
+    SimOutput simOutput = SpinMixerJob(pos);
+    FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
+}
+
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
+void CSFixedUpdate2(
+    uint3 groupId : SV_GroupID,
+    uint3 groupThreadId : SV_GroupThreadID,
+    uint groupIndex : SV_GroupIndex)
+{
+    // SpherePlane simulation
+}
+
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
+void CSFixedUpdate3(
+    uint3 groupId : SV_GroupID,
+    uint3 groupThreadId : SV_GroupThreadID,
+    uint groupIndex : SV_GroupIndex)
+{
+    // SphereField simulation
+}
+
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
+void CSFixedUpdate4(
+    uint3 groupId : SV_GroupID,
+    uint3 groupThreadId : SV_GroupThreadID,
+    uint groupIndex : SV_GroupIndex)
+{
+    // FigureEight simulation
+}
+
+[numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
+void CSFixedUpdate5(
+    uint3 groupId : SV_GroupID,
+    uint3 groupThreadId : SV_GroupThreadID,
+    uint groupIndex : SV_GroupIndex)
+{
+    // PerlinNoise simulation
 }
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]

@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(ParticleRenderer))]
-public class ParticleRendererEditor : Editor
+[CustomEditor(typeof(ComputeParticleManager))]
+public class ComputeParticleManagerEditor : Editor
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        var renderer = target as ParticleRenderer;
+        var renderer = target as ComputeParticleManager;
         if(renderer == null)
         {
             return;
         }
 
-        if(GUILayout.Button("Restart"))
-        {
-            renderer.Restart();
-        }
+        //if(GUILayout.Button("Restart"))
+        //{
+        //    renderer.Restart();
+        //}
     }
 }

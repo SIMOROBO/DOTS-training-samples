@@ -201,7 +201,7 @@ GameObject:
   - component: {fileID: 1807567669}
   - component: {fileID: 1807567671}
   m_Layer: 0
-  m_Name: ComputeShaderRunner
+  m_Name: ComputeParticleManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -233,6 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9795725ae394d4f4cbf8b4ca4e9ac529, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  simulationDuration: 10
   _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   _material: {fileID: 2100000, guid: 1e5d6d6076e23f04e9d0eadb30c357ca, type: 2}
   _computeShader: {fileID: 7200000, guid: 2e9e0b59fcaf74b44b1b0db786908682, type: 3}

@@ -1,8 +1,8 @@
 ﻿public enum DistanceFieldModel
 {
-    SpherePlane,
     Metaballs,
     SpinMixer,
+    SpherePlane,
     SphereField,
     FigureEight,
     PerlinNoise

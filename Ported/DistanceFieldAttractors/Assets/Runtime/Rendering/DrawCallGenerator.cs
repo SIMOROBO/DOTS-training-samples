@@ -3,7 +3,7 @@ using UnityEngine;
  
 public static class DrawCallGenerator
 {
-    public static ParticleDrawCall GetComputeDrawcall(ComputeShader shader, Mesh instanceMesh, Material material, uint count, ParticleRenderer.SimulationParams simulationParams)
+    public static ParticleDrawCall GetComputeDrawcall(ComputeShader shader, Mesh instanceMesh, Material material, uint count, ComputeParticleManager.SimulationParams simulationParams)
     {
         if (shader == null)
         {

@@ -11,9 +11,9 @@ public class ParticleDrawCall
     public ComputeBuffer FixedUpdateBuffer { get; set; }
     public ComputeShader ComputeShader { get; set; }    
     public uint Count { get; set; }
-    public ParticleRenderer.SimulationParams SimulationParams { get; set; }
+    public ComputeParticleManager.SimulationParams SimulationParams { get; set; }
     public bool IsInitialized { get; set; }
-    int k_kernelSize = 4;
+    int k_kernelSize = 4;    
 
     public void Initialize()
     {
@@ -77,11 +77,16 @@ public class ParticleDrawCall
         }
     }
 
-    public void FixedUpdate()
+    public void FixedUpdate(DistanceFieldModel mode)
     {
         if (IsInitialized && ComputeShader != null)
         {
-            int kernelIndex = ComputeShader.FindKernel("CSFixedUpdate0");
+            int modeIndex = (int)mode;
+
+            // Until we support all 6 simulation models.
+            modeIndex = modeIndex % 2;
+
+            int kernelIndex = ComputeShader.FindKernel($"CSFixedUpdate{modeIndex}");
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));

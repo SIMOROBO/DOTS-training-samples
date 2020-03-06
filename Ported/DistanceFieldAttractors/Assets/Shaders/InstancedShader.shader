@@ -9,7 +9,7 @@
 
 				#pragma vertex vert
 				#pragma fragment frag
-				#pragma enable_d3d11_debug_symbols
+				//#pragma enable_d3d11_debug_symbols
 				#pragma target 4.5
 
 				#include "UnityCG.cginc"

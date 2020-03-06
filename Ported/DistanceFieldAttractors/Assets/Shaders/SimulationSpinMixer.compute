@@ -35,9 +35,3 @@ SimOutput SpinMixerJob(float3 pos)
 
     return simOutput;
 }
-
-
-SimOutput RunSim1(int index)
-{
-    return SpinMixerJob(FixedUpdateBuffer[index].position);
-}
