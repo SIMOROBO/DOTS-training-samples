@@ -146,4 +146,19 @@ float4x4 LookAtTRSC(float3 position, float3 directionNormalized, float3 scale, f
         );
 }
 
+float4x4 BuildCustomMatrix(float3 position, float3 directionNormalized, float scaleZ, float3 color)
+{
+    float3 up = float3(0, 1, 0);
+    float3 zAxis = directionNormalized;
+    float3 xAxis = normalize(cross(up, zAxis));
+    float3 yAxis = cross(zAxis, xAxis);
+
+    return float4x4(
+            float4(xAxis.x, yAxis.x, zAxis.x, position.x),
+            float4(xAxis.y, yAxis.y, zAxis.y, position.y),
+            float4(xAxis.z, yAxis.z, zAxis.z, position.z),
+            float4(color.x, color.y, color.z, scaleZ)
+        );
+}
+
 #endif
