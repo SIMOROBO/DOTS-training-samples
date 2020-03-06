@@ -1,0 +1,21 @@
+#include "CommonParticleComputeShader.compute"
+
+SimOutput GetDistancePerlinNoiseJob(float3 pos)
+{
+    SimOutput simOutput;
+    float dist = 9999999.9f;
+    float3 normal = 0;
+
+    float x = pos.x;
+    float y = pos.y;
+    float z = pos.z;
+
+    float  perlin = rand_float(float2(x * 0.2f, z * 0.2f));
+    dist = y - perlin * 6.0f;
+    normal = float3(0.0,1.0,0.0);
+
+    simOutput.dist = dist;
+    simOutput.normal = normal;
+
+    return simOutput;
+}

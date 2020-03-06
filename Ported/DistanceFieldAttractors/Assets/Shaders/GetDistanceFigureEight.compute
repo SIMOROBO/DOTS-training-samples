@@ -1,0 +1,33 @@
+#include "CommonParticleComputeShader.compute"
+
+SimOutput GetDistanceFigureEightJob(float3 pos)
+{
+    SimOutput simOutput;
+    float dist = 9999999.9f;
+    float3 normal = 0;
+
+    float x = pos.x;
+    float y = pos.y;
+    float z = pos.z;
+
+    float ringRadius = 4.0f;
+    float flipper = 1.0f;
+    if (z < 0.0f)
+    {
+        z = -z;
+        flipper = -1.0f;
+    }
+
+    float3 pointPos = normalize(float3(x, 0.0f, z - ringRadius)) * ringRadius;
+    float angle = atan2(pointPos.z, pointPos.x) + gTime * 8.0f;
+    pointPos += float3(0.0f, 0.0f, 1.0f) * ringRadius;
+    normal = float3(x - pointPos.x, y - pointPos.y, (z - pointPos.z) * flipper);
+    float wave = cos(angle * flipper * 3.0f) * 0.5f + 0.5f;
+    wave *= wave * 0.5f;
+    dist = length(normal) - (0.5f + wave);
+
+    simOutput.dist = dist;
+    simOutput.normal = normal;
+
+    return simOutput;
+}

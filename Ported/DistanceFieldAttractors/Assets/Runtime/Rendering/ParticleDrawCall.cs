@@ -84,7 +84,7 @@ public class ParticleDrawCall
             int modeIndex = (int)mode;
 
             // Until we support all 6 simulation models.
-            modeIndex = modeIndex % 2;
+            modeIndex = modeIndex % 6;
 
             int kernelIndex = ComputeShader.FindKernel($"CSFixedUpdate{modeIndex}");
             if (kernelIndex != -1)

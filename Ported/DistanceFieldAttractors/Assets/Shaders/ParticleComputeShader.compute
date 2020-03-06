@@ -11,6 +11,10 @@
 #include "CommonParticleComputeShader.compute"
 #include "SimulationMetaballs.compute"
 #include "SimulationSpinMixer.compute"
+#include "GetDistanceSpherePlane.compute"
+#include "GetDistanceSphereField.compute"
+#include "GetDistanceFigureEight.compute"
+#include "GetDistancePerlinNoise.compute"
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
 void CSInitialize (
@@ -68,7 +72,10 @@ void CSFixedUpdate2(
     uint3 groupThreadId : SV_GroupThreadID,
     uint groupIndex : SV_GroupIndex)
 {
-    // SpherePlane simulation
+	uint index = GetParticleIndex(groupId, groupIndex);
+	float3 pos = FixedUpdateBuffer[index].position;
+	SimOutput simOutput = GetDistanceSpherePlaneJob(pos);
+	FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
 }
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
@@ -77,7 +84,10 @@ void CSFixedUpdate3(
     uint3 groupThreadId : SV_GroupThreadID,
     uint groupIndex : SV_GroupIndex)
 {
-    // SphereField simulation
+	uint index = GetParticleIndex(groupId, groupIndex);
+	float3 pos = FixedUpdateBuffer[index].position;
+	SimOutput simOutput = GetDistanceSphereFieldJob(pos);
+	FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
 }
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
@@ -86,7 +96,10 @@ void CSFixedUpdate4(
     uint3 groupThreadId : SV_GroupThreadID,
     uint groupIndex : SV_GroupIndex)
 {
-    // FigureEight simulation
+		uint index = GetParticleIndex(groupId, groupIndex);
+		float3 pos = FixedUpdateBuffer[index].position;
+		SimOutput simOutput = GetDistanceFigureEightJob(pos);
+		FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
 }
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]
@@ -95,7 +108,10 @@ void CSFixedUpdate5(
     uint3 groupThreadId : SV_GroupThreadID,
     uint groupIndex : SV_GroupIndex)
 {
-    // PerlinNoise simulation
+	uint index = GetParticleIndex(groupId, groupIndex);
+	float3 pos = FixedUpdateBuffer[index].position;
+	SimOutput simOutput = GetDistancePerlinNoiseJob(pos);
+	FixedUpdateBuffer[index] = ComputeParticleData(index, simOutput.normal, simOutput.dist);
 }
 
 [numthreads(KERNEL_SIZE, KERNEL_SIZE, KERNEL_SIZE)]

@@ -1,0 +1,23 @@
+#include "CommonParticleComputeShader.compute"
+
+SimOutput GetDistanceSpherePlaneJob(float3 pos)
+{
+    SimOutput simOutput;
+    float dist = 9999999.9f;
+    float3 normal = 0;
+
+    float sphereDist = Sphere(pos, 5.0f);
+    float3 sphereNormal = normalize(pos);
+
+    float planeDist = pos.y;
+    float3 planeNormal = float3(0.0f, 1.0f, 0.0f);
+
+    float t = sin(gTime * 8.0f) * 0.4f + 0.4f;
+    dist = lerp(sphereDist, planeDist, t);
+    normal = lerp(sphereNormal, planeNormal, t);
+
+    simOutput.dist = dist;
+    simOutput.normal = normal;
+
+    return simOutput;
+}
