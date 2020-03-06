@@ -32,24 +32,18 @@
                 {
                     float4x4 transform = transformBuffer[instanceID];
                     float3x3 rotate = (float3x3)transform;
-                    // transform = mul(transform, float4(0.1, 0.01, 0.5, 1.0));
                     float3 scale = float3(0.1, 0.01, 0.5);
-                    transform[0][0] *= scale.x;
-                    transform[1][0] *= scale.x;
-                    transform[2][0] *= scale.x;
-                    transform[0][1] *= scale.y;
-                    transform[1][1] *= scale.y;
-                    transform[2][1] *= scale.y;
-                    transform[0][2] *= scale.z;
-                    transform[1][2] *= scale.z;
-                    transform[2][2] *= scale.z;
-                    float3 worldPosition = mul(transform, float4(v.vertex.xyz, 1)).xyz;
+                    transform._11_21_31 *= scale.x;
+                    transform._12_22_32 *= scale.y;
+                    transform._13_23_33 *= scale.z;
+
+                    float3 worldPosition = mul(transform, float4(v.vertex.xyz, 1.0f)).xyz;
 
                     v2f o;
                     // half3 worldNormal = UnityObjectToWorldNormal(v.normal);
                     half3 worldNormal = mul(rotate, v.normal);
                     o.worldNormal = worldNormal;
-                    o.ambient = ShadeSH9(half4(worldNormal,1));
+                    o.ambient = ShadeSH9(half4(worldNormal, 1.0));
 
                     o.pos = mul(UNITY_MATRIX_VP, float4(worldPosition, 1.0f));
                     float3 c = float3(
