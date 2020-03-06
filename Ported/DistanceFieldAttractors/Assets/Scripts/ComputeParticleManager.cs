@@ -7,6 +7,7 @@ public class ComputeParticleManager : MonoBehaviour
     [System.Serializable]
     public struct SimulationParams
     {
+        public uint numberOfParticles;
         public float attraction;
         public float jitter;
         public Color surfaceColor;

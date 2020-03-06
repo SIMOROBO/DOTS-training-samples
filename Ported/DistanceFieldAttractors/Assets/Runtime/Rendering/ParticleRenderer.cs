@@ -14,7 +14,7 @@ public class ParticleRenderer
 
         if (_drawcall == null && _mesh != null && _material != null)
         {
-            _drawcall = DrawCallGenerator.GetComputeDrawcall(computeShader, _mesh, _material, 32768, simulationParams);
+            _drawcall = DrawCallGenerator.GetComputeDrawcall(computeShader, _mesh, _material, simulationParams.numberOfParticles, simulationParams);
         }
 
         if (!_drawcall.IsInitialized)
