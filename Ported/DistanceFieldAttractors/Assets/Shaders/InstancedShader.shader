@@ -32,6 +32,17 @@
                 {
                     float4x4 transform = transformBuffer[instanceID];
                     float3x3 rotate = (float3x3)transform;
+                    // transform = mul(transform, float4(0.1, 0.01, 0.5, 1.0));
+                    float3 scale = float3(0.1, 0.01, 0.5);
+                    transform[0][0] *= scale.x;
+                    transform[1][0] *= scale.x;
+                    transform[2][0] *= scale.x;
+                    transform[0][1] *= scale.y;
+                    transform[1][1] *= scale.y;
+                    transform[2][1] *= scale.y;
+                    transform[0][2] *= scale.z;
+                    transform[1][2] *= scale.z;
+                    transform[2][2] *= scale.z;
                     float3 worldPosition = mul(transform, float4(v.vertex.xyz, 1)).xyz;
 
                     v2f o;
