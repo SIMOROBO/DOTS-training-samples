@@ -40,11 +40,17 @@ public class ComputeParticleManager : MonoBehaviour
 
     private void Update()
     {
+        if (m_particleRenderer == null)
+            return;
+
         m_particleRenderer.Draw();
     }
 
     private void FixedUpdate()
     {
+        if (m_particleRenderer == null)
+            return;
+
         if (Time.realtimeSinceStartup - _simulationStartTime > simulationDuration)
         {
             int simulationIndex = ((int)m_currentSimulation + 1) % Enum.GetValues(typeof(DistanceFieldModel)).Length;
@@ -57,6 +63,9 @@ public class ComputeParticleManager : MonoBehaviour
 
     private void OnDisable()
     {
+        if (m_particleRenderer == null)
+            return;
+
         m_particleRenderer.Release();
     }
 }

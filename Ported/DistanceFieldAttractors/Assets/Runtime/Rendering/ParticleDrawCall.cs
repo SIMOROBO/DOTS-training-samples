@@ -36,7 +36,7 @@ public class ParticleDrawCall
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
-                int chunksPerRow = System.Convert.ToInt32(instancesPerRow / k_kernelSize);
+                int chunksPerRow = Mathf.CeilToInt(instancesPerRow / k_kernelSize);
 
                 ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
                 ComputeShader.SetBuffer(kernelIndex, "TransformsBuffer", PositionBuffer);
@@ -63,7 +63,7 @@ public class ParticleDrawCall
             if (kernelIndex != -1 && FixedUpdateBuffer != null)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
-                int chunksPerRow = System.Convert.ToInt32(instancesPerRow / k_kernelSize);
+                int chunksPerRow = Mathf.CeilToInt(instancesPerRow / k_kernelSize);
 
                 ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
                 ComputeShader.SetBuffer(kernelIndex, "TransformsBuffer", PositionBuffer);
@@ -90,7 +90,7 @@ public class ParticleDrawCall
             if (kernelIndex != -1)
             {
                 int instancesPerRow = System.Convert.ToInt32(System.Math.Pow(Count, (1.0 / 3.0)));
-                int chunksPerRow = System.Convert.ToInt32(instancesPerRow / k_kernelSize);
+                int chunksPerRow = Mathf.CeilToInt(instancesPerRow / k_kernelSize);
 
                 ComputeShader.SetBuffer(kernelIndex, "FixedUpdateBuffer", FixedUpdateBuffer);
                 ComputeShader.SetInt("gChunksPerRow", chunksPerRow);
