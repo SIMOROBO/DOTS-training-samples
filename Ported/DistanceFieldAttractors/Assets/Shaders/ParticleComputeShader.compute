@@ -54,19 +54,13 @@ void CSUpdate (
 {
     uint index = GetParticleIndex(groupId, groupIndex);
     FixedUpdateData data = FixedUpdateBuffer[index];
+    float3 position = data.position;
+    float3 velocity = data.velocity;
     float3 color = data.color;
-    float3 pos = data.position;
 
-    float scale = float3(0.1f, 0.01f, max(0.1f, length(data.velocity) * gSpeedStretch));
-    float4x4 rot = LookAtMatrix(normalize(data.velocity));
+    float3 velocityNormalized = normalize(velocity);
+    float velocityLength = dot(velocity, velocityNormalized);
+    float3 scale = float3(0.01f, 0.1f, max(0.1f, velocityLength * gSpeedStretch));
 
-    //float4x4 m = float4x4.TRS(particleData.Position, q, scale);
-
-    TransformsBuffer[index] =
-        float4x4(
-            float4(1, 0, 0, pos.x),
-            float4(0, 1, 0, pos.y),
-            float4(0, 0, 1, pos.z),
-            float4(data.color, 1)
-        );
+    TransformsBuffer[index] = LookAtTRSC(position, velocityNormalized, scale, color);
 }

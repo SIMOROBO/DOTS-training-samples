@@ -119,15 +119,30 @@ float4x4 LookAtMatrix(float3 target)
 {
     float3 eye = 0;
     float3 up = float3(0, 1, 0);
-    float3 zaxis = normalize(target - eye);
-    float3 xaxis = normalize(cross(up, zaxis));
-    float3 yaxis = cross(zaxis, xaxis);
+    float3 zAxis = normalize(target - eye);
+    float3 xAxis = normalize(cross(up, zAxis));
+    float3 yAxis = cross(zAxis, xAxis);
 
     return float4x4(
-            float4(xaxis.x, yaxis.x, zaxis.x, 0),
-            float4(xaxis.y, yaxis.y, zaxis.y, 0),
-            float4(xaxis.z, yaxis.z, zaxis.z, 0),
-            float4(-dot(xaxis, eye), -dot(yaxis, eye), -dot(zaxis, eye), 1)
+            float4(xAxis.x, yAxis.x, zAxis.x, 0),
+            float4(xAxis.y, yAxis.y, zAxis.y, 0),
+            float4(xAxis.z, yAxis.z, zAxis.z, 0),
+            float4(-dot(xAxis, eye), -dot(yAxis, eye), -dot(zAxis, eye), 1)
+        );
+}
+
+float4x4 LookAtTRSC(float3 position, float3 directionNormalized, float3 scale, float3 color)
+{
+    float3 up = float3(0, 1, 0);
+    float3 zAxis = directionNormalized;
+    float3 xAxis = normalize(cross(up, zAxis));
+    float3 yAxis = cross(zAxis, xAxis);
+
+    return float4x4(
+            float4(xAxis.x * scale.x, yAxis.x * scale.y, zAxis.x * scale.z, position.x),
+            float4(xAxis.y * scale.x, yAxis.y * scale.y, zAxis.y * scale.z, position.y),
+            float4(xAxis.z * scale.x, yAxis.z * scale.y, zAxis.z * scale.z, position.z),
+            float4(color.x, color.y, color.z, 1)
         );
 }
 
