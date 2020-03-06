@@ -85,6 +85,7 @@ public class ParticleDrawCall
 
             // Until we support all 6 simulation models.
             modeIndex = modeIndex % 6;
+            //modeIndex = (int)DistanceFieldModels.PerlinNoise;
 
             int kernelIndex = ComputeShader.FindKernel($"CSFixedUpdate{modeIndex}");
             if (kernelIndex != -1)

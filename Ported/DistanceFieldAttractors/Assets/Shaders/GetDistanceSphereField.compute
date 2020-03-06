@@ -3,19 +3,15 @@
 SimOutput GetDistanceSphereFieldJob(float3 pos)
 {
     SimOutput simOutput;
-    float dist = 9999999.9f;
-    float3 normal = 0;
 
     float spacing = 5.0f + sin(gTime * 5.0f) * 2.0f;
-    float spacingVector = float3(1.0f, 1.0f, 1.0f) * spacing * 0.5f;
+    float spacingVector = spacing * 0.5f;
     pos += spacingVector;
     pos -= floor(pos / spacing) * spacing;
     pos -= spacingVector;
-    dist = Sphere(pos, 5.0f);
-    normal = pos;
 
-    simOutput.dist = dist;
-    simOutput.normal = normal;
+    simOutput.dist = Sphere(pos, 5.0f);
+    simOutput.normal = pos;
 
     return simOutput;
 }

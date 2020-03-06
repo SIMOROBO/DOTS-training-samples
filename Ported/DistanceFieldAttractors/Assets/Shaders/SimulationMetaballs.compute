@@ -3,7 +3,7 @@
 SimOutput SimulationMetaballs(float3 pos)
 {
     SimOutput simOutput;
-    float dist = 9999999.9f;
+    float dist = LARGE_FLOAT_VALUE;
     float3 normal = 0;
 
     [unroll(5)]
