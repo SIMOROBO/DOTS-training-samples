@@ -238,7 +238,7 @@ MonoBehaviour:
   _material: {fileID: 2100000, guid: 1e5d6d6076e23f04e9d0eadb30c357ca, type: 2}
   _computeShader: {fileID: 7200000, guid: 2e9e0b59fcaf74b44b1b0db786908682, type: 3}
   simulationParams:
-    numberOfParticles: 32768
+    numberOfParticles: 4000
     attraction: 0.003
     jitter: 0.001
     surfaceColor: {r: 0.31989613, g: 0.24178201, b: 0.63235295, a: 1}
