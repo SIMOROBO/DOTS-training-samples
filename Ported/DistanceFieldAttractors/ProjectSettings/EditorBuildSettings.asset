@@ -4,4 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 0
+    path: Assets/_Scenes/attractors_Compute_FX.unity
+    guid: 49f464bbb7fef43738dd0eace356bc00
+  - enabled: 1
+    path: Assets/_Scenes/attractors_ECS_FX.unity
+    guid: 778d70b547e48499aac00e2bddb0e272
+  m_configObjects: {}
